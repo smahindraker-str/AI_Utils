@@ -2,8 +2,10 @@
 
 import MetricCard from "@/components/MetricCard";
 import ChartCard from "@/components/ChartCard";
-import StatusBadge from "@/components/StatusBadge";
-import { Laptop, Smartphone, Tablet, Tv, Cpu, HardDrive, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  Laptop, Smartphone, Tablet, Tv, AlertCircle,
+  Users, Clock, Target, UserCheck, FileText, Send,
+} from "lucide-react";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -25,13 +27,35 @@ const osDistribution = [
   { os: "tvOS 18", count: 420 },
 ];
 
-const refreshSchedule = [
-  { quarter: "Q2 2026", devices: 840, type: "iPhone", status: "pending" as const },
-  { quarter: "Q2 2026", devices: 320, type: "iPad", status: "pending" as const },
-  { quarter: "Q3 2026", devices: 180, type: "Mac", status: "pending" as const },
-  { quarter: "Q3 2026", devices: 560, type: "iPhone", status: "pending" as const },
-  { quarter: "Q4 2026", devices: 420, type: "iPad", status: "pending" as const },
+const activeIncidents = [
+  { id: "INC-2841", title: "WiFi dropouts — West Region stores", priority: "P1", assignee: "Alex K.", store: "Multiple (8 stores)", age: "2h 15m", sla: "on-track", category: "Network" },
+  { id: "INC-2840", title: "POS terminal boot loop — Chicago", priority: "P1", assignee: "Unassigned", store: "#892 Chicago", age: "45m", sla: "at-risk", category: "Hardware" },
+  { id: "INC-2839", title: "MDM profile push failures — new iPads", priority: "P2", assignee: "Priya P.", store: "#445 Seattle", age: "3h 20m", sla: "on-track", category: "MDM" },
+  { id: "INC-2838", title: "RetailConnect sync delays >5min", priority: "P2", assignee: "Sam J.", store: "All stores", age: "1h 50m", sla: "on-track", category: "Application" },
+  { id: "INC-2837", title: "Apple TV signage blank — Boston", priority: "P3", assignee: "Alex K.", store: "#3301 Boston", age: "4h", sla: "on-track", category: "Display" },
+  { id: "INC-2836", title: "Badge printer offline — New York", priority: "P3", assignee: "Unassigned", store: "#1890 New York", age: "5h 30m", sla: "breached", category: "Peripheral" },
+  { id: "INC-2835", title: "Mac mini overheating alert — Dallas", priority: "P2", assignee: "Jordan S.", store: "#1022 Dallas", age: "2h", sla: "on-track", category: "Hardware" },
+  { id: "INC-2834", title: "Certificate expiry warning — SCEP server", priority: "P1", assignee: "Jordan S.", store: "Infrastructure", age: "30m", sla: "on-track", category: "Security" },
 ];
+
+const teamMembers = [
+  { name: "Alex K.", role: "Network Specialist", active: 2, resolved: 5, avatar: "AK" },
+  { name: "Priya P.", role: "MDM Admin", active: 1, resolved: 3, avatar: "PP" },
+  { name: "Sam J.", role: "App Support", active: 1, resolved: 4, avatar: "SJ" },
+  { name: "Jordan S.", role: "L3 Engineer", active: 2, resolved: 2, avatar: "JS" },
+];
+
+const priorityConfig: Record<string, { color: string; bg: string }> = {
+  P1: { color: "#ff3b30", bg: "#ff3b3015" },
+  P2: { color: "#ff9500", bg: "#ff950015" },
+  P3: { color: "#007aff", bg: "#007aff15" },
+};
+
+const slaConfig: Record<string, { label: string; color: string }> = {
+  "on-track": { label: "On Track", color: "#34c759" },
+  "at-risk": { label: "At Risk", color: "#ff9500" },
+  "breached": { label: "Breached", color: "#ff3b30" },
+};
 
 const tooltipStyle = {
   background: "rgba(255,255,255,0.95)",
@@ -43,38 +67,153 @@ const tooltipStyle = {
 export default function TechnologyOverview() {
   return (
     <div className="space-y-6">
-      {/* Fleet Summary */}
+      {/* Morning Shift KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Total Devices"
-          value="9,520"
-          change={5.2}
-          changeLabel="this quarter"
-          icon={<Cpu size={16} className="text-blue-500" />}
-          color="#007aff"
-        />
-        <MetricCard
-          title="Pending Refresh"
-          value="1,420"
-          subtitle="Devices past 3-year lifecycle"
-          icon={<RefreshCw size={16} className="text-orange-500" />}
-          color="#ff9500"
-        />
-        <MetricCard
-          title="OS Compliance"
-          value="92.1%"
-          change={3.8}
-          changeLabel="vs last month"
-          icon={<HardDrive size={16} className="text-green-500" />}
-          color="#34c759"
-        />
-        <MetricCard
-          title="Active Alerts"
-          value="7"
-          subtitle="Requiring tech manager attention"
+          title="Active Incidents"
+          value="8"
+          subtitle="2 P1, 3 P2, 3 P3"
           icon={<AlertCircle size={16} className="text-red-500" />}
           color="#ff3b30"
         />
+        <MetricCard
+          title="SLA Compliance"
+          value="96%"
+          change={2.1}
+          changeLabel="vs last shift"
+          icon={<Target size={16} className="text-green-500" />}
+          color="#34c759"
+        />
+        <MetricCard
+          title="Team Utilization"
+          value="4/4"
+          subtitle="All team members active"
+          icon={<Users size={16} className="text-blue-500" />}
+          color="#007aff"
+        />
+        <MetricCard
+          title="Resolved Today"
+          value="14"
+          change={16}
+          changeLabel="vs yesterday"
+          icon={<Clock size={16} className="text-orange-500" />}
+          color="#ff9500"
+        />
+      </div>
+
+      {/* Incident Triage + Team Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Incident Queue */}
+        <div className="lg:col-span-2">
+          <ChartCard
+            title="Incident Triage"
+            subtitle={`${activeIncidents.filter(i => i.assignee === "Unassigned").length} unassigned — prioritized by SLA impact`}
+            action={
+              <div className="flex gap-2">
+                {["All", "P1", "P2", "P3"].map((f) => (
+                  <button key={f} className={`text-[11px] px-2 py-1 rounded-md font-medium ${f === "All" ? "bg-accent text-white" : "bg-surface-secondary text-text-secondary"}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            }
+          >
+            <div className="space-y-2">
+              {activeIncidents.map((inc) => {
+                const p = priorityConfig[inc.priority];
+                const sla = slaConfig[inc.sla];
+                return (
+                  <div key={inc.id} className={`p-3 rounded-hig transition-colors cursor-pointer ${inc.assignee === "Unassigned" ? "bg-red-50 border border-red-100" : "bg-surface-secondary hover:bg-black/[0.04]"}`}>
+                    <div className="flex items-start justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-text-tertiary">{inc.id}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: p.bg, color: p.color }}>{inc.priority}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-text-tertiary">{inc.category}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-medium" style={{ color: sla.color }}>{sla.label}</span>
+                        <span className="text-[11px] text-text-tertiary">{inc.age}</span>
+                      </div>
+                    </div>
+                    <p className="text-[13px] font-medium text-text-primary mb-1.5">{inc.title}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-text-secondary">{inc.store}</span>
+                      <div className="flex items-center gap-2">
+                        {inc.assignee === "Unassigned" ? (
+                          <button className="flex items-center gap-1 text-[11px] px-2 py-1 bg-accent text-white rounded font-medium">
+                            <UserCheck size={10} /> Assign
+                          </button>
+                        ) : (
+                          <span className="flex items-center gap-1 text-[11px] text-text-secondary">
+                            <div className="w-4 h-4 rounded-full bg-accent/20 flex items-center justify-center text-[8px] font-bold text-accent">
+                              {inc.assignee.split(" ").map(n => n[0]).join("")}
+                            </div>
+                            {inc.assignee}
+                          </span>
+                        )}
+                        <button className="text-[11px] px-2 py-1 bg-surface-secondary rounded text-text-secondary hover:bg-black/[0.06]">
+                          Delegate
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ChartCard>
+        </div>
+
+        {/* Team Panel + Shift Handoff */}
+        <div className="space-y-4">
+          <div className="card p-5">
+            <h3 className="text-[15px] font-semibold text-text-primary mb-1">Team Status</h3>
+            <p className="text-[12px] text-text-secondary mb-4">Day Shift — 7:00 AM to 6:00 PM</p>
+            <div className="space-y-3">
+              {teamMembers.map((member) => (
+                <div key={member.name} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                    <span className="text-[10px] text-white font-bold">{member.avatar}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[13px] font-medium text-text-primary">{member.name}</p>
+                    <p className="text-[11px] text-text-tertiary">{member.role}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[12px] text-text-primary font-medium">{member.active} active</p>
+                    <p className="text-[10px] text-success">{member.resolved} resolved</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Shift Handoff */}
+          <div className="card p-5 border-l-4 border-l-accent">
+            <div className="flex items-center gap-2 mb-3">
+              <Send size={16} className="text-accent" />
+              <h3 className="text-[15px] font-semibold text-text-primary">Shift Handoff</h3>
+            </div>
+            <p className="text-[12px] text-text-secondary mb-3">Night shift starts at 6:00 PM</p>
+            <div className="space-y-2 mb-3">
+              <div className="flex justify-between text-[12px]">
+                <span className="text-text-secondary">Open incidents to hand off</span>
+                <span className="font-medium text-text-primary">5</span>
+              </div>
+              <div className="flex justify-between text-[12px]">
+                <span className="text-text-secondary">Pending deployments</span>
+                <span className="font-medium text-text-primary">2</span>
+              </div>
+              <div className="flex justify-between text-[12px]">
+                <span className="text-text-secondary">Monitoring alerts</span>
+                <span className="font-medium text-warning">3</span>
+              </div>
+            </div>
+            <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-accent text-white rounded-lg text-[13px] font-medium hover:bg-accent-hover transition-colors">
+              <FileText size={14} />
+              Generate Handoff Report
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Fleet Composition & Lifecycle */}
@@ -122,7 +261,7 @@ export default function TechnologyOverview() {
           { name: "Apple TV", count: 420, icon: <Tv size={20} />, color: "#af52de" },
         ].map((device) => (
           <div key={device.name} className="card p-5">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-hig flex items-center justify-center" style={{ backgroundColor: device.color + "12" }}>
                 <span style={{ color: device.color }}>{device.icon}</span>
               </div>
@@ -134,26 +273,6 @@ export default function TechnologyOverview() {
           </div>
         ))}
       </div>
-
-      {/* Refresh Schedule */}
-      <ChartCard title="Upcoming Refresh Schedule" subtitle="Planned device replacements">
-        <div className="space-y-2">
-          {refreshSchedule.map((item, i) => (
-            <div key={i} className="flex items-center gap-4 p-3 rounded-hig bg-surface-secondary">
-              <div className="w-20 text-[13px] font-medium text-text-primary">{item.quarter}</div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-text-primary font-medium">{item.devices} {item.type} devices</span>
-                </div>
-                <div className="mt-1.5 h-1.5 bg-border rounded-full overflow-hidden">
-                  <div className="h-full bg-accent rounded-full" style={{ width: `${(item.devices / 840) * 100}%` }} />
-                </div>
-              </div>
-              <StatusBadge status={item.status} />
-            </div>
-          ))}
-        </div>
-      </ChartCard>
     </div>
   );
 }

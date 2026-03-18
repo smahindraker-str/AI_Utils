@@ -2,7 +2,36 @@
 
 import MetricCard from "@/components/MetricCard";
 import StatusBadge from "@/components/StatusBadge";
-import { ArrowUpCircle, Clock, Wrench, Terminal, Search, Smartphone, User, FileText, Activity, Download } from "lucide-react";
+import {
+  ArrowUpCircle, Clock, Wrench, Terminal, Search, Smartphone, User,
+  FileText, Activity, Download, Zap, Brain, Truck,
+  Wifi, Battery,
+} from "lucide-react";
+
+const patternAlerts = [
+  {
+    id: "PAT-047",
+    title: "iOS Battery Drain Detected",
+    description: "47 devices across 12 stores showing >15% daily battery drain since RetailConnect v4.2.1 update",
+    severity: "high",
+    confidence: 92,
+    affectedDevices: 47,
+    suggestedAction: "Roll back RetailConnect to v4.2.0 on affected devices, collect battery diagnostics",
+    category: "Application",
+    detectedAt: "35 min ago",
+  },
+  {
+    id: "PAT-046",
+    title: "WiFi Roaming Failures — West Region",
+    description: "Spike in WiFi disconnections when devices roam between APs in stores with firmware 4.2.1",
+    severity: "medium",
+    confidence: 85,
+    affectedDevices: 23,
+    suggestedAction: "Compare AP configs between affected/unaffected stores, check 802.11r settings",
+    category: "Network",
+    detectedAt: "2 hrs ago",
+  },
+];
 
 const escalatedTickets = [
   {
@@ -16,6 +45,7 @@ const escalatedTickets = [
     store: "#1247 — San Francisco",
     notes: "L1 attempted WiFi reset, cleared network settings. Issue persists across multiple devices in same zone. Possible AP issue.",
     diagnostics: { sysdiagnose: true, logs: true, networkCapture: false },
+    escalationQuality: 95,
   },
   {
     id: "TKT-8830",
@@ -28,30 +58,20 @@ const escalatedTickets = [
     store: "#445 — Seattle",
     notes: "Enrollment completes but configuration profile install fails with error -402. Checked MDM server connectivity, appears normal.",
     diagnostics: { sysdiagnose: false, logs: true, networkCapture: false },
+    escalationQuality: 88,
   },
   {
     id: "TKT-8825",
-    subject: "RetailConnect crashes during inventory sync",
+    subject: "POS device hardware failure — no display output",
     escalatedFrom: "L1 — Sam K.",
     escalatedAt: "4 hrs ago",
     priority: "medium",
-    category: "Application",
-    device: "iPhone 14 — F2LXH9P2KQ",
-    store: "#2103 — Miami",
-    notes: "App crashes consistently when syncing inventory > 500 items. Force quit and reinstall did not resolve. Crash logs collected.",
-    diagnostics: { sysdiagnose: true, logs: true, networkCapture: false },
-  },
-  {
-    id: "TKT-8818",
-    subject: "Mac mini kernel panic on boot — recurring",
-    escalatedFrom: "L1 — Pat D.",
-    escalatedAt: "6 hrs ago",
-    priority: "critical",
     category: "Hardware",
-    device: "Mac mini M4 — C02FC4Y9MD6",
-    store: "#3301 — Boston",
-    notes: "Kernel panic occurs during boot, safe mode works. Suspect third-party kext conflict. Need sysdiagnose and kernel logs.",
+    device: "iPad Pro 12.9\" — DLXQ92MF7N",
+    store: "#2103 — Miami",
+    notes: "Device powers on (vibration confirmed) but display remains black. Force restart, DFU mode attempted — no change. Likely hardware failure.",
     diagnostics: { sysdiagnose: false, logs: false, networkCapture: false },
+    escalationQuality: 92,
   },
 ];
 
@@ -74,6 +94,13 @@ export default function L2SupportPage() {
           color="#ff9500"
         />
         <MetricCard
+          title="Pattern Alerts"
+          value="2"
+          subtitle="AI-detected anomalies"
+          icon={<Brain size={16} className="text-purple-500" />}
+          color="#af52de"
+        />
+        <MetricCard
           title="Avg Resolution"
           value="38 min"
           change={-22}
@@ -82,19 +109,70 @@ export default function L2SupportPage() {
           color="#007aff"
         />
         <MetricCard
-          title="Diagnostics Run"
-          value="14"
-          subtitle="Today"
-          icon={<Wrench size={16} className="text-purple-500" />}
-          color="#af52de"
+          title="Devices Fixed Today"
+          value="11"
+          change={22}
+          changeLabel="vs yesterday"
+          icon={<Wrench size={16} className="text-green-500" />}
+          color="#34c759"
         />
-        <MetricCard
-          title="Escalated to L3"
-          value="1"
-          subtitle="Today"
-          icon={<Terminal size={16} className="text-red-500" />}
-          color="#ff3b30"
-        />
+      </div>
+
+      {/* AI Pattern Detection Alerts */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Brain size={16} className="text-purple-500" />
+          <h3 className="text-[13px] font-semibold text-text-tertiary uppercase tracking-wider">AI Pattern Detection</h3>
+        </div>
+        <div className="space-y-3">
+          {patternAlerts.map((alert) => {
+            const p = priorityConfig[alert.severity];
+            return (
+              <div key={alert.id} className="card p-5 border-l-4 border-l-purple-400">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Zap size={14} className="text-purple-500" />
+                      <span className="text-[11px] font-mono text-text-tertiary">{alert.id}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: p.bg, color: p.color }}>
+                        {alert.severity.toUpperCase()}
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-text-tertiary">{alert.category}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-medium">
+                        {alert.confidence}% confidence
+                      </span>
+                    </div>
+                    <h4 className="text-[15px] font-semibold text-text-primary">{alert.title}</h4>
+                  </div>
+                  <span className="text-[11px] text-text-tertiary shrink-0">{alert.detectedAt}</span>
+                </div>
+
+                <p className="text-[13px] text-text-secondary mb-3">{alert.description}</p>
+
+                <div className="p-3 bg-purple-50 rounded-hig border border-purple-100 mb-3">
+                  <p className="text-[11px] font-semibold text-purple-600 mb-1">Suggested Action:</p>
+                  <p className="text-[12px] text-text-secondary">{alert.suggestedAction}</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-[12px] text-text-secondary">
+                    <Smartphone size={12} className="inline mr-1" />{alert.affectedDevices} devices affected
+                  </span>
+                  <div className="flex-1" />
+                  <button className="text-[12px] px-3 py-1.5 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors">
+                    Investigate
+                  </button>
+                  <button className="text-[12px] px-3 py-1.5 bg-accent text-white rounded-lg font-medium">
+                    Deploy Fix
+                  </button>
+                  <button className="text-[12px] px-3 py-1.5 bg-surface-secondary rounded-lg text-text-secondary">
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -108,7 +186,7 @@ export default function L2SupportPage() {
           {escalatedTickets.map((ticket) => {
             const priority = priorityConfig[ticket.priority];
             return (
-              <div key={ticket.id} className="card p-5 hover:shadow-hig-md transition-shadow cursor-pointer">
+              <div key={ticket.id} className="card p-5 hover:shadow-hig-md transition-shadow">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono text-text-tertiary">{ticket.id}</span>
@@ -117,7 +195,12 @@ export default function L2SupportPage() {
                     </span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-text-tertiary">{ticket.category}</span>
                   </div>
-                  <span className="text-[11px] text-text-tertiary">{ticket.escalatedAt}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-600 font-medium">
+                      Escalation Quality: {ticket.escalationQuality}%
+                    </span>
+                    <span className="text-[11px] text-text-tertiary">{ticket.escalatedAt}</span>
+                  </div>
                 </div>
 
                 <h4 className="text-[14px] font-semibold text-text-primary mb-2">{ticket.subject}</h4>
@@ -130,11 +213,11 @@ export default function L2SupportPage() {
 
                 {/* L1 Notes */}
                 <div className="p-3 bg-surface-secondary rounded-hig mb-3">
-                  <p className="text-[11px] font-semibold text-text-tertiary mb-1">L1 Notes:</p>
+                  <p className="text-[11px] font-semibold text-text-tertiary mb-1">L1 Notes (context preserved):</p>
                   <p className="text-[12px] text-text-secondary leading-relaxed">{ticket.notes}</p>
                 </div>
 
-                {/* Diagnostic Status & Actions */}
+                {/* Actions */}
                 <div className="flex items-center gap-3 pt-3 border-t border-border">
                   <div className="flex items-center gap-2">
                     {[
@@ -153,9 +236,15 @@ export default function L2SupportPage() {
                     ))}
                   </div>
                   <div className="flex-1" />
-                  <button className="text-[12px] px-3 py-1.5 bg-accent text-white rounded-lg font-medium">
-                    Run Diagnostics
-                  </button>
+                  {ticket.category === "Hardware" ? (
+                    <button className="flex items-center gap-1 text-[12px] px-3 py-1.5 bg-orange-500 text-white rounded-lg font-medium">
+                      <Truck size={12} /> Order Replacement
+                    </button>
+                  ) : (
+                    <button className="text-[12px] px-3 py-1.5 bg-accent text-white rounded-lg font-medium">
+                      Run Diagnostics
+                    </button>
+                  )}
                   <button className="text-[12px] px-3 py-1.5 bg-surface-secondary rounded-lg text-text-secondary">
                     Escalate to L3
                   </button>
@@ -165,15 +254,17 @@ export default function L2SupportPage() {
           })}
         </div>
 
-        {/* Diagnostic Tools Panel */}
+        {/* Diagnostic Tools + Device Inspector */}
         <div className="space-y-4">
           <div className="card p-5">
-            <h3 className="text-[15px] font-semibold text-text-primary mb-4">Diagnostic Tools</h3>
+            <h3 className="text-[15px] font-semibold text-text-primary mb-4">Advanced Diagnostics</h3>
             <div className="space-y-2">
               {[
-                { label: "Run Sysdiagnose", desc: "Capture full system diagnostic bundle", icon: <Terminal size={16} />, color: "#007aff" },
-                { label: "Collect Logs", desc: "Retrieve device and app logs", icon: <FileText size={16} />, color: "#34c759" },
-                { label: "Network Capture", desc: "Start packet capture on device", icon: <Activity size={16} />, color: "#ff9500" },
+                { label: "Run Sysdiagnose", desc: "Full system diagnostic bundle", icon: <Terminal size={16} />, color: "#007aff" },
+                { label: "Collect Logs", desc: "Device and app logs", icon: <FileText size={16} />, color: "#34c759" },
+                { label: "Network Capture", desc: "Packet capture on device", icon: <Activity size={16} />, color: "#ff9500" },
+                { label: "WiFi Analyzer", desc: "Signal strength and roaming analysis", icon: <Wifi size={16} />, color: "#5ac8fa" },
+                { label: "Battery Report", desc: "Health, cycles, and drain analysis", icon: <Battery size={16} />, color: "#34c759" },
                 { label: "Export Bundle", desc: "Download diagnostic archive", icon: <Download size={16} />, color: "#af52de" },
               ].map((tool) => (
                 <button
@@ -198,16 +289,20 @@ export default function L2SupportPage() {
             </div>
             <div className="space-y-2 text-[12px]">
               <div className="flex justify-between p-2 bg-surface-secondary rounded">
-                <span className="text-text-tertiary">Last Sysdiagnose</span>
-                <span className="text-text-primary">2 hrs ago</span>
-              </div>
-              <div className="flex justify-between p-2 bg-surface-secondary rounded">
                 <span className="text-text-tertiary">MDM Status</span>
                 <StatusBadge status="online" />
               </div>
               <div className="flex justify-between p-2 bg-surface-secondary rounded">
                 <span className="text-text-tertiary">Compliance</span>
                 <span className="text-success font-medium">Compliant</span>
+              </div>
+              <div className="flex justify-between p-2 bg-surface-secondary rounded">
+                <span className="text-text-tertiary">Last Sysdiagnose</span>
+                <span className="text-text-primary">2 hrs ago</span>
+              </div>
+              <div className="flex justify-between p-2 bg-surface-secondary rounded">
+                <span className="text-text-tertiary">Battery Health</span>
+                <span className="text-success font-medium">94%</span>
               </div>
             </div>
           </div>
