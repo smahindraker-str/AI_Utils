@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matin Storyboard v1</title>
+<style>
+  :root {
+    --stage: #0b0b0d; --card: #1c1c1e; --line: #2c2c30;
+    --fg: #f5f5f7; --fg2: #8e8e93; --fg3: #48484c;
+    --ok: #30d158; --bad: #ff453a;
+    --sheet: #f5f5f7; --ink: #1d1d1f; --ink2: #6e6e73;
+    --sans: Inter, -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --sheet: #141416; --ink: #f5f5f7; --ink2: #8e8e93; }
+  }
+  :root[data-theme="dark"] { --sheet: #141416; --ink: #f5f5f7; --ink2: #8e8e93; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--sheet); color: var(--ink); font-family: var(--sans); padding: 48px 16px 80px; }
+  header, main { max-width: 1680px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 36px; }
+  header h1 { font-size: clamp(28px, 4vw, 48px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+  header h1 span { color: var(--ink2); font-weight: 400; }
+  header p { color: var(--ink2); font-size: 17px; margin-top: 8px; max-width: 760px; line-height: 1.45; }
+  .tag { font: 500 13px var(--mono); color: var(--ink2); border: 1px solid currentColor; border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+  .act { font: 600 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink2); border-top: 1px solid color-mix(in srgb, var(--ink2) 40%, transparent); padding-top: 12px; margin: 40px 0 18px; display: flex; justify-content: space-between; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 24px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---- the 16:9 frame ---- */
+  .f { aspect-ratio: 16 / 9; container-type: inline-size; background: var(--stage); border-radius: 10px; overflow: hidden; position: relative; color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 28px rgba(0,0,0,.10); }
+  .f > .in { position: absolute; inset: 0; padding: 6.2cqw 6.8cqw; }
+  .k { font: 400 1.15cqw/1 var(--mono); letter-spacing: 0.16em; color: var(--fg2); text-transform: uppercase; display: flex; align-items: center; gap: 0.8cqw; }
+  .k.lc { text-transform: none; letter-spacing: 0.04em; }
+  .h { font-weight: 900; font-size: 4.6cqw; line-height: 1.02; letter-spacing: -0.045em; margin-top: 1.6cqw; }
+  .h.xl { font-size: 7cqw; }
+  .h.md { font-size: 3.6cqw; }
+  .b { font-weight: 400; font-size: 1.55cqw; line-height: 1.38; color: var(--fg2); margin-top: 1.6cqw; max-width: 34cqw; }
+  .b strong { color: var(--fg); font-weight: 700; }
+  .dim { color: var(--fg3); }
+  .ok { color: var(--ok); }
+  .ring { width: 1.6cqw; height: 1.6cqw; flex: none; }
+  .ring circle { fill: none; stroke-width: 3; }
+  .chips { display: flex; gap: 0.7cqw; margin-top: 1.6cqw; flex-wrap: wrap; }
+  .chip { font: 400 1.05cqw/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); color: var(--fg); border-radius: 99px; padding: .6cqw 1cqw; }
+  .ipad { position: absolute; background: #000; border-radius: 2.3cqw; padding: 0.9cqw; box-shadow: 0 2cqw 5cqw rgba(0,0,0,.55); border: 0.15cqw solid #3a3a3e; }
+  .ipad img, .win img { display: block; width: 100%; border-radius: 1.4cqw; }
+  .win { position: absolute; background: #fff; border-radius: 1.4cqw; overflow: hidden; box-shadow: 0 2cqw 5cqw rgba(0,0,0,.55); }
+  .win img { border-radius: 0; }
+
+  /* ---- labels under each frame ---- */
+  .lab { display: flex; justify-content: space-between; font: 600 12px var(--mono); letter-spacing: .06em; margin-top: 12px; color: var(--ink); }
+  .lab span:last-child { color: var(--ink2); font-weight: 400; }
+  .note { font-size: 14px; line-height: 1.5; color: var(--ink2); margin-top: 6px; }
+  .note b { color: var(--ink); }
+  .seam { display: inline-block; font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--ink2) 50%, transparent); color: var(--ink2); border-radius: 99px; padding: 3px 10px; margin-top: 8px; }
+
+  /* ---- closing cells ---- */
+  .meta { background: var(--card); color: var(--fg); }
+  .meta .in { padding: 4.5cqw 5cqw; }
+  .seams { display: grid; grid-template-columns: repeat(8, 1fr); gap: .6cqw; margin-top: 2.4cqw; }
+  .seams div { font: 400 1cqw/1.3 var(--mono); color: var(--fg2); border-top: .25cqw solid var(--fg3); padding-top: .6cqw; }
+  .seams div.cut { border-color: var(--fg); color: var(--fg); }
+  .sw { display: flex; gap: 1cqw; margin-top: 2cqw; flex-wrap: wrap; }
+  .sw div { font: 400 .95cqw/1.3 var(--mono); color: var(--fg2); }
+  .sw i { display: block; width: 7cqw; height: 4cqw; border-radius: .8cqw; margin-bottom: .5cqw; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Matin, Lululemon <span>· Storyboard v1</span></h1>
+    <p>Modernizing Retail Mobility. Each frame shows the key moment of its scene in final type and color. Product screens are the real captures from the deck. No motion yet.</p>
+  </div>
+  <div class="tag">1920×1080 · 153s · 16 scenes · music, no VO</div>
+</header>
+<main>
+
+<!-- ========== ACT I ========== -->
+<div class="act"><span>Act I · The premise</span><span>0:00 to 0:21</span></div>
+<div class="grid">
+
+  <section>
+    <div class="f" id="frame-01"><div class="in">
+      <div class="k">Retail runs on iOS</div>
+      <div class="h xl" style="margin-top:12cqw">Modernizing<br>Retail Mobility.</div>
+      <div class="b" style="font-size:2.2cqw;color:var(--fg2)">Matin, Lululemon.</div>
+      <img src="assets/deck/image1.png" alt="" style="position:absolute;right:5cqw;bottom:4cqw;width:16cqw;opacity:.9">
+    </div></div>
+    <div class="lab"><span>01 · OPEN</span><span>00:00 to 00:07</span></div>
+    <p class="note"><b>Kicker types first,</b> then the headline rises word by word; name fades in grey. Logo sits quietly bottom right.</p>
+    <span class="seam">in: cut from black</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-02"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#48484c" stroke-dasharray="40 100"/></svg>The starting point</div>
+      <div class="h md dim" style="margin-top:9cqw">We replaced an aging MDM platform.</div>
+      <div class="h xl" style="margin-top:2cqw">What changed was<br>much bigger.</div>
+    </div></div>
+    <div class="lab"><span>02 · STARTING POINT</span><span>00:07 to 00:14</span></div>
+    <p class="note"><b>Line one lands and holds,</b> then dims to grey as line two scales in at full white. The status ring is introduced grey and broken.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-03"><div class="in">
+      <div class="h md">Two layers, two jobs.</div>
+      <div style="position:absolute;left:6.8cqw;right:6.8cqw;top:19cqw;height:12cqw;border-radius:1.6cqw;background:#f5f5f7;color:#1d1d1f;padding:2.2cqw 2.6cqw">
+        <div class="k" style="color:#6e6e73">ienterprise</div>
+        <div style="font-weight:800;font-size:2.6cqw;letter-spacing:-.03em;margin-top:1cqw">Builds on that and manages operations.</div>
+      </div>
+      <svg viewBox="0 0 20 40" style="position:absolute;left:49cqw;top:31.5cqw;width:2cqw;height:4cqw"><path d="M10 38 V4 M3 11 L10 3 L17 11" stroke="#8e8e93" stroke-width="2" fill="none"/></svg>
+      <div style="position:absolute;left:6.8cqw;right:6.8cqw;top:36cqw;height:12cqw;border-radius:1.6cqw;background:var(--card);border:1px solid var(--line);padding:2.2cqw 2.6cqw">
+        <div class="k">MDM</div>
+        <div style="font-weight:800;font-size:2.6cqw;letter-spacing:-.03em;margin-top:1cqw">Manages the devices. <span style="color:var(--fg2)">Reliably.</span></div>
+      </div>
+    </div></div>
+    <div class="lab"><span>03 · TWO LAYERS</span><span>00:14 to 00:21</span></div>
+    <p class="note"><b>MDM slab rises from the bottom first,</b> the arrow draws up, then the ienterprise slab lands on top of it.</p>
+    <span class="seam">in: push left</span>
+  </section>
+</div>
+
+<!-- ========== ACT II ========== -->
+<div class="act"><span>Act II · Before and after</span><span>0:21 to 0:42</span></div>
+<div class="grid">
+
+  <section>
+    <div class="f" id="frame-04"><div class="in">
+      <div class="k">The problem</div>
+      <div class="h md" style="margin-top:1cqw">Before ienterprise.</div>
+      <div style="margin-top:2.4cqw;display:grid;gap:1.25cqw;max-width:52cqw;opacity:.45">
+        <div class="k lc" style="font-family:var(--sans);font-size:1.5cqw;color:var(--fg)"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#48484c" stroke-dasharray="40 100"/></svg>Educators could not see if a device was healthy.</div>
+        <div class="k lc" style="font-family:var(--sans);font-size:1.5cqw;color:var(--fg)"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#48484c" stroke-dasharray="40 100"/></svg>Every issue went to the Educator Help Center.</div>
+        <div class="k lc" style="font-family:var(--sans);font-size:1.5cqw;color:var(--fg)"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#48484c" stroke-dasharray="40 100"/></svg>Every fix needed access to an MDM console.</div>
+        <div class="k lc" style="font-family:var(--sans);font-size:1.5cqw;color:var(--fg);line-height:1.3;align-items:flex-start"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#48484c" stroke-dasharray="40 100"/></svg>Troubleshooting took too long, with back-and-forth between stores and the Educator Help Center.</div>
+      </div>
+      <div style="position:absolute;left:6.8cqw;bottom:5.5cqw;display:flex;align-items:center;gap:1.6cqw">
+        <div style="font-weight:700;font-size:2.2cqw;border:1px solid var(--line);border-radius:99px;padding:1cqw 2cqw;color:var(--fg2)">One educator, waiting.</div>
+        <div style="color:var(--fg2);font-size:2.2cqw">→</div>
+        <div style="font-weight:800;font-size:2.2cqw;border:1px solid var(--bad);color:var(--fg);border-radius:99px;padding:1cqw 2cqw">One guest, waiting.</div>
+      </div>
+    </div></div>
+    <div class="lab"><span>04 · BEFORE</span><span>00:21 to 00:33</span></div>
+    <p class="note"><b>Four pains stack in, one every ~1.4s,</b> then dim. The pills land last and the frame holds still for 1.5s on "One guest, waiting."</p>
+    <span class="seam">in: cut (act change)</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-05"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>The answer</div>
+      <div class="h md" style="margin-top:1cqw">After ienterprise.</div>
+      <div style="position:absolute;left:6.8cqw;right:6.8cqw;top:20cqw;display:grid;grid-template-columns:1fr 1fr;gap:2cqw">
+        <div style="background:var(--card);border-radius:1.6cqw;padding:2.6cqw;height:27cqw">
+          <div class="k">Enterprise Manager</div>
+          <div style="font-weight:800;font-size:2.5cqw;letter-spacing:-.03em;line-height:1.1;margin-top:1.6cqw">One view across every store and every device.</div>
+          <div class="b" style="font-size:1.35cqw">For the people who run the fleet.</div>
+        </div>
+        <div style="background:var(--card);border-radius:1.6cqw;padding:2.6cqw;height:27cqw">
+          <div class="k">Site Manager</div>
+          <div style="font-weight:800;font-size:2.5cqw;letter-spacing:-.03em;line-height:1.1;margin-top:1.6cqw">Every device in the store, and whether it is healthy.</div>
+          <div class="b" style="font-size:1.35cqw">For the people who run the store.</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="lab"><span>05 · AFTER</span><span>00:33 to 00:42</span></div>
+    <p class="note"><b>The broken ring closes to green first,</b> then shrinks into the kicker. Cards rise left, then right. Answers the grey rings of 04.</p>
+    <span class="seam">in: cut</span>
+  </section>
+
+  <section>
+    <div class="f meta" style="background:var(--stage)"><div class="in" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <svg viewBox="0 0 36 36" style="width:9cqw;height:9cqw"><circle cx="18" cy="18" r="15" fill="none" stroke="#48484c" stroke-width="2.4" stroke-dasharray="40 100"/></svg>
+      <div style="font-size:2.2cqw;font-weight:300;color:var(--fg2);margin:1.4cqw 0">→</div>
+      <svg viewBox="0 0 36 36" style="width:9cqw;height:9cqw"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="2.4"/></svg>
+      <div class="k" style="margin-top:2.4cqw;justify-content:center">The spine · the status ring</div>
+    </div></div>
+    <div class="lab"><span>SPINE</span><span>runs 02 to 16</span></div>
+    <p class="note"><b>One device-health ring threads the film,</b> taken from the Site Manager Health screen: grey and broken through the before act, closed and green from 05, last thing lit in 16.</p>
+  </section>
+</div>
+
+<!-- ========== ACT III ========== -->
+<div class="act"><span>Act III · The platform at work</span><span>0:42 to 1:49</span></div>
+<div class="grid">
+
+  <section>
+    <div class="f" id="frame-06"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Enterprise Manager · Retail Technology</div>
+      <div class="h md" style="max-width:32cqw;margin-top:8cqw">One view across every store and every device.</div>
+      <div class="win" style="left:43cqw;top:13cqw;width:62cqw"><img src="assets/deck/image4.png" alt=""></div>
+    </div></div>
+    <div class="lab"><span>06 · EM RETAIL TECH</span><span>00:42 to 00:50</span></div>
+    <p class="note"><b>Window slides in from the right,</b> then one continuous slow push toward "Store readiness 90.0%."</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-07"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Enterprise Manager · Networking</div>
+      <div class="h md" style="max-width:32cqw;margin-top:6cqw">All devices in the store and the network, correlated.</div>
+      <div class="b" style="max-width:30cqw">The fleet, understood before the phone rings.</div>
+      <div class="win" style="left:43cqw;top:12cqw;width:62cqw"><img src="assets/deck/image5.png" alt=""></div>
+    </div></div>
+    <div class="lab"><span>07 · EM NETWORKING</span><span>00:50 to 00:58</span></div>
+    <p class="note"><b>Camera drifts along the topology</b> from access point out to the device groups. Sub line fades in at 4s.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-08"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Site Manager · Store leaders</div>
+      <div class="h md" style="max-width:40cqw;margin-top:6cqw">Is the store ready to open? One glance.</div>
+      <div class="b">Every device in the store, and whether it is healthy. iPhones, iPads, payment devices, printers.</div>
+      <div class="b" style="color:var(--fg);font-weight:700;display:flex;gap:.8cqw;align-items:center"><span style="width:1cqw;height:1cqw;border-radius:50%;background:var(--ok);display:inline-block"></span>Ready for business.</div>
+      <div class="ipad" style="right:7cqw;top:6cqw;width:30cqw"><img src="assets/deck/image6.png" alt=""></div>
+    </div></div>
+    <div class="lab"><span>08 · SM STORE LEADERS</span><span>00:58 to 01:06</span></div>
+    <p class="note"><b>iPad rises in on the right,</b> headline left. "Ready for business." lands last with the green dot.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-09"><div class="in">
+      <div class="ipad" style="left:7cqw;top:6cqw;width:30cqw"><img src="assets/deck/image7.png" alt=""></div>
+      <div style="position:absolute;left:46cqw;top:6.2cqw;right:6cqw">
+        <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Site Manager · Educators</div>
+        <div class="h md" style="margin-top:6cqw">See the problem.<br>Fix it on the spot.</div>
+        <div class="chips"><span class="chip">Wi-Fi</span><span class="chip">Battery</span><span class="chip">OS</span></div>
+        <div class="b" style="max-width:40cqw">Guided steps, on the device. Resolved in the store. Fewer calls to the Educator Help Center, and better ones.</div>
+      </div>
+    </div></div>
+    <div class="lab"><span>09 · SM EDUCATORS</span><span>01:06 to 01:14</span></div>
+    <p class="note"><b>Mirror of 08 for rhythm:</b> iPad left, type right. Chips tick in one by one. Callback to the Help Center pain in 04.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-10"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Site Manager · ServiceNow</div>
+      <div class="h md" style="margin-top:1cqw">Incidents arrive with evidence.</div>
+      <div class="k" style="margin-top:1.4cqw;color:var(--fg)">Create it. Track it. Close it.</div>
+      <div class="ipad" style="left:22cqw;top:20cqw;width:20cqw;transform:rotate(-4deg)"><img src="assets/deck/image8.png" alt=""></div>
+      <div class="ipad" style="left:40cqw;top:17cqw;width:20cqw;z-index:2"><img src="assets/deck/image9.png" alt=""></div>
+      <div class="ipad" style="left:58cqw;top:20cqw;width:20cqw;transform:rotate(4deg)"><img src="assets/deck/image10.png" alt=""></div>
+      <div class="chips" style="position:absolute;right:5cqw;top:6cqw;flex-direction:column;align-items:flex-end"><span class="chip">battery</span><span class="chip">Wi-Fi</span><span class="chip">latency</span><span class="chip">OS</span><span class="chip">apps</span></div>
+      <div style="position:absolute;left:6.8cqw;bottom:4.5cqw;font-weight:700;font-size:1.7cqw;max-width:14cqw">Faster first-call resolution.</div>
+    </div></div>
+    <div class="lab"><span>10 · SM SERVICENOW</span><span>01:14 to 01:24</span></div>
+    <p class="note"><b>Three screens fan in with a stagger:</b> issues, detail, telemetry. Telemetry tags pop down the right. Close line lands last.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-11"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Site Manager · Security</div>
+      <div class="h" style="margin-top:5cqw;font-size:4.2cqw">Device audit.<br><span style="color:var(--fg2)">Daily.</span><br>By the store.</div>
+      <div class="b">Every device accounted for. Exceptions surfaced and resolved in the store. A report for every store, every day.</div>
+      <div class="ipad" style="left:52cqw;top:9cqw;width:22cqw;transform:rotate(-3deg)"><img src="assets/deck/image11.png" alt=""></div>
+      <div class="ipad" style="left:68cqw;top:13cqw;width:22cqw;transform:rotate(3deg)"><img src="assets/deck/image12.png" alt=""></div>
+    </div></div>
+    <div class="lab"><span>11 · SM AUDIT</span><span>01:24 to 01:32</span></div>
+    <p class="note"><b>Headline in three hard beats,</b> one word group per beat. The audit iPad and report slide in overlapping.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-12"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Site Manager · Payment and PCI</div>
+      <div class="h md" style="margin-top:1cqw">Every PIN pad inspected. Every day.</div>
+      <div class="ipad" style="left:7cqw;top:17cqw;width:19cqw"><img src="assets/deck/image13.png" alt=""></div>
+      <div class="b" style="position:absolute;left:28.5cqw;top:24cqw;max-width:18cqw">Signed, timestamped, in the audit.</div>
+      <div class="ipad" style="left:50cqw;top:17cqw;width:19cqw;border-color:var(--bad)"><img src="assets/deck/image14.png" alt=""></div>
+      <div class="b" style="position:absolute;left:71.5cqw;top:24cqw;max-width:20cqw;color:var(--fg)">Tampering found? <span style="color:var(--fg2)">One tap opens a security and PCI incident.</span></div>
+    </div></div>
+    <div class="lab"><span>12 · SM PCI</span><span>01:32 to 01:41</span></div>
+    <p class="note"><b>Pass screen first,</b> then the tamper screen slides in beside it with the only red of this act.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-13"><div class="in">
+      <div class="k"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" stroke="#30d158"/></svg>Enterprise Manager · Security and store support</div>
+      <div class="h md" style="max-width:38cqw;margin-top:5cqw">PIM and PAM requirements met. Support still enabled.</div>
+      <div class="b" style="color:var(--fg)">Least privilege for the platform.<br><span style="color:var(--fg2)">Full capability for the store.</span></div>
+      <div class="b"><strong>Smart Support:</strong> the fix before the escalation.</div>
+      <div class="win" style="left:50cqw;top:12cqw;width:50cqw"><img src="assets/deck/image15.png" alt=""></div>
+    </div></div>
+    <div class="lab"><span>13 · EM SECURITY</span><span>01:41 to 01:49</span></div>
+    <p class="note"><b>Two lines swap in place,</b> platform then store. Smart Support line closes the scene and the act.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f meta"><div class="in">
+      <div class="k">Proof rhythm · act III</div>
+      <div style="font-weight:800;font-size:2.6cqw;letter-spacing:-.03em;margin-top:1.6cqw;line-height:1.15">Every proof scene: kicker with green ring, one headline, one real screen, one continuous camera move.</div>
+      <div class="b" style="max-width:none">Screens alternate right, left, center so eight proofs never read as eight identical slides. Fleet scenes (EM) use a browser window; store scenes (SM) use an iPad frame.</div>
+    </div></div>
+    <div class="lab"><span>RHYTHM</span><span>06 to 13</span></div>
+  </section>
+</div>
+
+<!-- ========== ACT IV ========== -->
+<div class="act"><span>Act IV · What changed</span><span>1:49 to 2:33</span></div>
+<div class="grid">
+
+  <section>
+    <div class="f" id="frame-14"><div class="in">
+      <div class="k lc">ienterprise</div>
+      <div class="h md" style="margin-top:1cqw">Business transformation at Lululemon.</div>
+      <div style="margin-top:2.4cqw;display:grid;gap:0;max-width:60cqw">
+        <div style="border-top:1px solid var(--line);padding:1.3cqw 0;display:grid;grid-template-columns:5cqw 1fr"><span class="k">01</span><div><div style="font-weight:800;font-size:2cqw">Stores open ready, every morning.</div><div class="b" style="margin-top:.4cqw;font-size:1.2cqw;max-width:none">Every store leader sees every device and knows the store is ready for business.</div></div></div>
+        <div style="border-top:1px solid var(--line);padding:1.3cqw 0;display:grid;grid-template-columns:5cqw 1fr"><span class="k">02</span><div><div style="font-weight:800;font-size:2cqw">Issues resolve faster.</div><div class="b" style="margin-top:.4cqw;font-size:1.2cqw;max-width:none">Incidents arrive with telemetry attached. Educators fix common issues on the spot.</div></div></div>
+        <div style="border-top:1px solid var(--line);padding:1.3cqw 0;display:grid;grid-template-columns:5cqw 1fr"><span class="k">03</span><div><div style="font-weight:800;font-size:2cqw">Compliance became routine.</div><div class="b" style="margin-top:.4cqw;font-size:1.2cqw;max-width:none">PIM and PAM requirements met. Audits and PCI tamper inspections done by the store, every day.</div></div></div>
+      </div>
+      <div style="position:absolute;right:6.8cqw;bottom:5cqw;width:26cqw;background:var(--card);border-radius:1.6cqw;padding:2cqw">
+        <div style="font-size:1.4cqw;line-height:1.35;color:var(--fg2)">Retail mobile operations are now more efficient and effective.</div>
+        <div style="font-weight:800;font-size:2cqw;margin-top:.8cqw;letter-spacing:-.02em">Educators stayed with guests.</div>
+      </div>
+    </div></div>
+    <div class="lab"><span>14 · OUTCOMES</span><span>01:49 to 02:04</span></div>
+    <p class="note"><b>Rows reveal one at a time, ~3s each,</b> on hairline rules. Then they dim and the closing card rises: the callback to "One guest, waiting."</p>
+    <span class="seam">in: cut (act change)</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-15"><div class="in">
+      <div class="k">The takeaways</div>
+      <div class="h md" style="margin-top:1cqw">For other retailers.</div>
+      <div style="position:absolute;left:6.8cqw;top:18cqw;display:grid;gap:.9cqw">
+        <span class="k dim">01</span><span class="k dim">02</span><span class="k" style="color:var(--fg)">03 ●</span><span class="k dim">04</span><span class="k dim">05</span><span class="k dim">06</span><span class="k dim">07</span>
+      </div>
+      <div style="position:absolute;left:18cqw;top:20cqw;right:8cqw">
+        <div style="font-weight:900;font-size:4.4cqw;letter-spacing:-.04em;line-height:1.05">Align priorities with internal teams early.</div>
+        <div style="font-size:2.4cqw;color:var(--fg2);margin-top:1.6cqw;font-weight:400">Shared support is not shared urgency.</div>
+      </div>
+    </div></div>
+    <div class="lab"><span>15 · TAKEAWAYS</span><span>02:04 to 02:25</span></div>
+    <p class="note"><b>Fixed rail, lesson swaps in place,</b> 3s each, all seven. Shown here at lesson 03. The active number turns white; no seven-card grid.</p>
+    <span class="seam">in: push left</span>
+  </section>
+
+  <section>
+    <div class="f" id="frame-16"><div class="in" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div class="h xl" style="margin-top:0">Done for them.<br>Not to them.</div>
+      <div class="b" style="max-width:none;font-size:1.9cqw">Retail mobility, managed in every store.</div>
+      <div style="display:flex;align-items:center;gap:1.4cqw;margin-top:4cqw">
+        <svg viewBox="0 0 36 36" style="width:2.6cqw;height:2.6cqw"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg>
+        <img src="assets/deck/image1.png" alt="" style="width:20cqw;margin:-3cqw -2cqw">
+      </div>
+    </div></div>
+    <div class="lab"><span>16 · CLOSE</span><span>02:26 to 02:33</span></div>
+    <p class="note"><b>"Done for them." then "Not to them."</b> Held 1.5s with nothing moving. Caption and lockup resolve; the green ring is the last thing lit.</p>
+    <span class="seam">in: cut</span>
+  </section>
+</div>
+
+<!-- ========== SEAMS + TOKENS ========== -->
+<div class="act"><span>Seams and tokens</span><span>one direction · leftward</span></div>
+<div class="grid">
+  <section>
+    <div class="f meta"><div class="in">
+      <div class="k">Seam map</div>
+      <div style="font-weight:800;font-size:2.4cqw;margin-top:1.2cqw;letter-spacing:-.02em">Content exits left, next scene enters right. Act changes cut through black.</div>
+      <div class="seams">
+        <div class="cut">01 cut</div><div>02 push</div><div>03 push</div><div class="cut">04 cut</div><div class="cut">05 cut</div><div>06 push</div><div>07 push</div><div>08 push</div>
+        <div>09 push</div><div>10 push</div><div>11 push</div><div>12 push</div><div>13 push</div><div class="cut">14 cut</div><div>15 push</div><div class="cut">16 cut</div>
+      </div>
+    </div></div>
+    <div class="lab"><span>SEAM MAP</span><span>16 seams</span></div>
+  </section>
+  <section>
+    <div class="f meta"><div class="in">
+      <div class="k">Tokens</div>
+      <div class="sw">
+        <div><i style="background:#0b0b0d"></i>stage<br>#0B0B0D</div>
+        <div><i style="background:#1c1c1e"></i>card<br>#1C1C1E</div>
+        <div><i style="background:#f5f5f7"></i>text<br>#F5F5F7</div>
+        <div><i style="background:#8e8e93"></i>text 2<br>#8E8E93</div>
+        <div><i style="background:#30d158"></i>ready<br>#30D158</div>
+        <div><i style="background:#ff453a"></i>alert<br>#FF453A</div>
+      </div>
+      <div style="margin-top:2.2cqw;font-weight:900;font-size:2.6cqw;letter-spacing:-.04em">Inter 900 · headlines</div>
+      <div style="font-size:1.5cqw;color:var(--fg2);margin-top:.4cqw">Inter 400 · body &nbsp;&nbsp; <span style="font-family:var(--mono);letter-spacing:.12em">JETBRAINS MONO · KICKERS</span></div>
+    </div></div>
+    <div class="lab"><span>TOKENS</span><span>from the deck</span></div>
+  </section>
+  <section>
+    <div class="f meta"><div class="in">
+      <div class="k">Bans</div>
+      <div style="font-size:1.55cqw;line-height:1.7;margin-top:1.6cqw;color:var(--fg)">
+        No gradient text, glow or neon.<br>
+        No fake product UI: real deck captures only.<br>
+        No stock icons standing in for product.<br>
+        No em dashes. Never "iEnterprise".<br>
+        No slideshow: each proof keeps one camera move.<br>
+        No screensaver: ambient motion must mean something.
+      </div>
+    </div></div>
+    <div class="lab"><span>BANS</span><span>whole film</span></div>
+  </section>
+</div>
+</main>
+</body>
+</html>

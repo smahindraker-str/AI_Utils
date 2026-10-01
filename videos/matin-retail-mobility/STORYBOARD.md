@@ -31,7 +31,7 @@ mode: collaborative
 - duration: 7s
 - poster: 5s
 - transition_in: cut
-- status: outline
+- status: built
 - blueprint: kinetic-type-beats + logo-assemble-lockup
 - src: compositions/01-open.html
 - voiceover: onscreen
@@ -45,7 +45,7 @@ Why: names the speaker, the company, and the claim in one breath.
 - duration: 7s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: kinetic-type-beats
 - src: compositions/02-starting-point.html
 - voiceover: onscreen
@@ -59,7 +59,7 @@ Why: sets up the turn the whole film pays off.
 - duration: 7s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: rules: waterfall-entry, svg-path-draw
 - src: compositions/03-two-layers.html
 - voiceover: onscreen
@@ -73,7 +73,7 @@ Why: positions ienterprise with respect to MDM, not against it.
 - duration: 12s
 - poster: 10s
 - transition_in: cut
-- status: outline
+- status: built
 - blueprint: rules: dynamic-content-sequencing, discrete-text-sequence
 - src: compositions/04-before.html
 - voiceover: onscreen
@@ -87,7 +87,7 @@ Why: the cost lands on the guest, which is the business reason for everything af
 - duration: 9s
 - poster: 7s
 - transition_in: cut
-- status: outline
+- status: built
 - blueprint: titlecard-reveal + grid-card-assemble
 - src: compositions/05-after.html
 - voiceover: onscreen
@@ -101,7 +101,7 @@ Why: the turn. Two products, two audiences.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase
 - src: compositions/06-em-retail-tech.html
 - voiceover: onscreen
@@ -115,7 +115,7 @@ Why: proof for the fleet audience.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase
 - src: compositions/07-em-networking.html
 - voiceover: onscreen
@@ -129,7 +129,7 @@ Why: shows the platform sees past the device to the network.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase
 - src: compositions/08-sm-store-leaders.html
 - voiceover: onscreen
@@ -143,7 +143,7 @@ Why: proof for the store leader audience.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase
 - src: compositions/09-sm-educators.html
 - voiceover: onscreen
@@ -157,7 +157,7 @@ Why: the direct answer to the before act.
 - duration: 10s
 - poster: 7s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase (showcase-carousel)
 - src: compositions/10-sm-servicenow.html
 - voiceover: onscreen
@@ -171,7 +171,7 @@ Why: proof that the help desk gets better calls, not just fewer.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: kinetic-type-beats + device-surface-showcase
 - src: compositions/11-sm-audit.html
 - voiceover: onscreen
@@ -185,7 +185,7 @@ Why: audit becomes a business capability, not an IT task.
 - duration: 9s
 - poster: 7s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: comparison-split
 - src: compositions/12-sm-pci.html
 - voiceover: onscreen
@@ -199,7 +199,7 @@ Why: compliance done by the store, every day.
 - duration: 8s
 - poster: 5s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: device-surface-showcase
 - src: compositions/13-em-security.html
 - voiceover: onscreen
@@ -213,7 +213,7 @@ Why: closes the security team's objection so the story is complete.
 - duration: 15s
 - poster: 12s
 - transition_in: cut
-- status: outline
+- status: built
 - blueprint: titlecard-reveal
 - src: compositions/14-outcomes.html
 - voiceover: onscreen
@@ -227,7 +227,7 @@ Why: the payoff of the message.
 - duration: 21s
 - poster: 4s
 - transition_in: push-left
-- status: outline
+- status: built
 - blueprint: fixed-anchor-cycle
 - src: compositions/15-takeaways.html
 - voiceover: onscreen
@@ -241,7 +241,7 @@ Why: makes the story useful to the audience in the room.
 - duration: 7s
 - poster: 5s
 - transition_in: cut
-- status: outline
+- status: built
 - blueprint: kinetic-type-beats + logo-assemble-lockup
 - src: compositions/16-close.html
 - voiceover: onscreen
