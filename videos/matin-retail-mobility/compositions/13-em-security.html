@@ -29,10 +29,17 @@
 #s13-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
 #s13-root .win img { display: block; width: 100%; }
 #s13-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+
+#s13-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#s13-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#s13-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#s13-root .ipad .scr img { border-radius: 0; }
 </style>
       <div id="s13-root" data-composition-id="s13" data-width="1920" data-height="1080">
   <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
-  <div class="stage">
+  <div class="stage" data-layout-allow-overflow>
   <div class="k "><svg class="ring k-ring" viewBox="0 0 36 36" style="width:30px;height:30px"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg><span class="k-t">Enterprise Manager · Security and store support</span></div>
   <div class="h md split" id="s13-head" style="position:absolute;left:130px;top:220px;width:760px">PIM and PAM requirements met. Support still enabled.</div>
   
@@ -41,6 +48,7 @@
   <div class="b" id="s13-c" style="position:absolute;left:132px;top:720px;width:720px"><strong>Smart Support:</strong> the fix before the escalation.</div>
   <div class="win" id="s13-win" style="left:960px;top:230px;width:960px"><img id="s13-img" src="assets/deck/image15.png" alt=""></div>
 
+  <div class="co" id="s13-co0" style="left:132px;top:860px"><i></i>Network conditions</div><div class="co" id="s13-co1" style="left:132px;top:860px"><i></i>Device checks</div><div class="co" id="s13-co2" style="left:132px;top:860px"><i></i>Thirty-day activity</div>
   </div>
 </div>
       <script>
@@ -57,8 +65,21 @@
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = 8.0;
+  const TL = gsap.timeline({ paused: true });
+  const D = 34.0, K = 1.7000, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -66,20 +87,33 @@
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#s13-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#s13-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#s13-root .stage', { scale: 1 }, 0);
+  TL.to('#s13-root .stage', { scale: 1.03, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
-  tl.fromTo('#s13-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
+  TL.fromTo('#s13-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
 
   rise('#s13-head', 0.3, 0.05);
   tl.fromTo('#s13-win', { x: 320, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.6);
-  tl.fromTo('#s13-img', { scale: 1 }, { scale: 1.12, transformOrigin: '30% 20%', duration: 6.5, ease: 'power1.inOut' }, 1.2);
   fadeUp('#s13-a', 2.0, 20);
   tl.to('#s13-a', { color: '#8e8e93', duration: 0.5 }, 3.4);
   tl.fromTo('#s13-b', { opacity: 0, y: 20, color: '#f5f5f7' }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 3.4);
   fadeUp('#s13-c', 5.0, 20);
+  TL.set('#s13-img', { transformOrigin: '0 0' }, 0);
+  TL.to('#s13-img', { x: -522.2, y: 0.0, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 11.00);
+  TL.fromTo('#s13-co0', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 12.30);
+  TL.to('#s13-co0', { opacity: 0, duration: 0.4 }, 17.00);
+  TL.to('#s13-img', { x: -280.3, y: -727.1, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 17.50);
+  TL.fromTo('#s13-co1', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 18.80);
+  TL.to('#s13-co1', { opacity: 0, duration: 0.4 }, 23.50);
+  TL.to('#s13-img', { x: -768.0, y: -772.7, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 24.00);
+  TL.fromTo('#s13-co2', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 25.30);
+  TL.to('#s13-co2', { opacity: 0, duration: 0.4 }, 30.00);
+  TL.to('#s13-img', { x: 0, y: 0, scale: 1, duration: 2.0, ease: 'power2.inOut' }, 30.50);
 
-  tl.to('#s13-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);
-  window.__timelines['s13'] = tl;
+  TL.to('#s13-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);
+  window.__timelines['s13'] = TL;
 })();
       </script>
     </template>

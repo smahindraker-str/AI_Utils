@@ -29,17 +29,25 @@
 #s09-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
 #s09-root .win img { display: block; width: 100%; }
 #s09-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+
+#s09-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#s09-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#s09-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#s09-root .ipad .scr img { border-radius: 0; }
 </style>
       <div id="s09-root" data-composition-id="s09" data-width="1920" data-height="1080">
   <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
-  <div class="stage">
-  <div class="ipad" id="s09-ipad" style="left:140px;top:90px;width:600px"><img src="assets/deck/image7.png" alt=""></div>
+  <div class="stage" data-layout-allow-overflow>
+  <div class="ipad" id="s09-ipad" style="left:140px;top:90px;width:600px"><div class="scr"><img src="assets/deck/image7.png" alt=""></div></div>
   <div class="k" style="left:900px"><svg class="ring k-ring" viewBox="0 0 36 36" style="width:30px;height:30px"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg><span class="k-t">Site Manager · Educators</span></div>
   <div class="h lg" id="s09-l1" style="position:absolute;left:900px;top:260px;width:960px">See the problem.</div>
   <div class="h lg" id="s09-l2" style="position:absolute;left:900px;top:360px;width:960px">Fix it on the spot.</div>
   <div id="s09-chips" style="position:absolute;left:900px;top:510px;display:flex;gap:14px">
     <span class="chip">Wi-Fi</span><span class="chip">Battery</span><span class="chip">OS</span></div>
   <div class="b" id="s09-body" style="position:absolute;left:902px;top:610px;width:820px">Guided steps, on the device. Resolved in the store. Fewer calls to the Educator Help Center, and better ones.</div>
+  <div class="co" id="s09-co0" style="left:902px;top:860px"><i></i>Apps</div><div class="co" id="s09-co1" style="left:902px;top:860px"><i></i>Fixes · guided steps</div><div class="co" id="s09-co2" style="left:902px;top:860px"><i></i>Device history</div>
   </div>
 </div>
       <script>
@@ -56,8 +64,21 @@
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = 7.0;
+  const TL = gsap.timeline({ paused: true });
+  const D = 27.0, K = 1.7000, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -65,9 +86,12 @@
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#s09-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#s09-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#s09-root .stage', { scale: 1 }, 0);
+  TL.to('#s09-root .stage', { scale: 1.03, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
-  tl.fromTo('#s09-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
+  TL.fromTo('#s09-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
 
   tl.fromTo('#s09-ipad', { x: -260, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0.05);
   fadeUp('#s09-root .k', 0.3, 12);
@@ -75,9 +99,20 @@
   tl.fromTo('#s09-l2', { opacity: 0, scale: 1.12, transformOrigin: '0% 50%' }, { opacity: 1, scale: 1, duration: 0.35, ease: 'power3.out' }, 1.0);
   tl.fromTo('#s09-chips .chip', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out', stagger: 0.22 }, 1.7);
   fadeUp('#s09-body', 2.6);
+  TL.set('#s09-ipad img', { transformOrigin: '0 0' }, 0);
+  TL.to('#s09-ipad img', { x: -22.4, y: -178.2, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 7.00);
+  TL.fromTo('#s09-co0', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 8.30);
+  TL.to('#s09-co0', { opacity: 0, duration: 0.4 }, 12.00);
+  TL.to('#s09-ipad img', { x: -2.2, y: -353.0, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 12.50);
+  TL.fromTo('#s09-co1', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 13.80);
+  TL.to('#s09-co1', { opacity: 0, duration: 0.4 }, 17.50);
+  TL.to('#s09-ipad img', { x: -22.4, y: -615.2, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 18.00);
+  TL.fromTo('#s09-co2', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 19.30);
+  TL.to('#s09-co2', { opacity: 0, duration: 0.4 }, 23.00);
+  TL.to('#s09-ipad img', { x: 0, y: 0, scale: 1, duration: 2.0, ease: 'power2.inOut' }, 23.50);
 
-  tl.to('#s09-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
-  window.__timelines['s09'] = tl;
+  TL.to('#s09-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s09'] = TL;
 })();
       </script>
     </template>

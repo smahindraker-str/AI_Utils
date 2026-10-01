@@ -83,8 +83,21 @@ SHARED_JS = """
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = DUR;
+  const TL = gsap.timeline({ paused: true });
+  const D = DUR, K = KVAL, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -92,14 +105,17 @@ SHARED_JS = """
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#ID-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#ID-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#ID-root .stage', { scale: 1 }, 0);
+  TL.to('#ID-root .stage', { scale: BREATHE, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
   PUSH_IN
 """
 
 EXIT_JS = """
   SEAM_OUT
-  window.__timelines['ID'] = tl;
+  window.__timelines['ID'] = TL;
 """
 
 GHOST = ('<svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" '
@@ -258,7 +274,7 @@ S["s08"] = proof("s08", "Site Manager · Store leaders", "Is the store ready to 
   <div class="ipad" id="s08-ipad" style="right:150px;top:90px;width:600px"><img src="assets/deck/image6.png" alt=""></div>
 """, "", """
   tl.fromTo('#s08-ipad', { y: 160, opacity: 0 }, { y: 0, opacity: 1, duration: 1.4, ease: 'power3.out' }, 0.3);
-  tl.to('#s08-ipad', { y: -18, duration: 8.0, ease: 'none' }, 1.7);
+  tl.to('#s08-ipad', { y: -18, duration: 8.0, ease: 'none', _k: 1 }, 1.7);
   rise('#s08-head', 0.9, 0.09, 0.9);
   fadeUp('#s08-body', 3.0);
   tl.fromTo('#s08-ready', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 5.4);
@@ -451,6 +467,106 @@ S["s16"] = (f"""
 """)
 
 
+# ---------------------------------------------------------------------------
+# Long cut (9:00): same scenes, stretched, with camera stations on the real screens.
+# ---------------------------------------------------------------------------
+# Scene lengths snapped to the phrase grid of assets/audio/aylex-rush-9min.mp3
+# (Rush looped at phrase boundaries: 0-140.4 + 14.4-140.4 x2 + 0.4-151.4, 1 s crossfades).
+LONG_DURS = [28.4, 21.0, 28.0, 42.0, 34.0, 21.0, 28.0, 35.0, 27.0, 35.0, 28.0, 28.0, 34.0, 49.0, 63.0, 39.0]
+# Proof scenes play their intro a little slower (K) and spend the rest of the scene on stations.
+LONG_K = {"s06": 1.7, "s07": 1.7, "s08": 1.7, "s09": 1.7, "s10": 1.7, "s11": 1.7, "s12": 1.7, "s13": 1.7}
+
+
+def scr(sel_w, img_w, img_h):
+    """Rendered size of an image of natural size img_w x img_h inside a frame sel_w wide."""
+    return sel_w, sel_w * img_h / img_w
+
+
+# Camera stations: zoom the real screenshot so a named panel sits at the viewport centre.
+# Labels are the panel names as they appear on screen, never the prototype's numbers.
+STATIONS = {
+    "s06": dict(img="#s06-img", size=scr(1190, 1466, 1048), view=(1090, 840), t0=4.0,
+                co=(132, 660), stops=[(0.14, 0.17, 2.0, "Store readiness"),
+                                      (0.26, 0.70, 1.7, "Store health by device"),
+                                      (0.86, 0.57, 2.0, "Support")]),
+    "s07": dict(img="#s07-img", size=scr(1190, 1384, 958), view=(1090, 820), t0=7.0,
+                co=(132, 780), stops=[(0.46, 0.30, 2.0, "Wi-Fi"),
+                                      (0.46, 0.73, 2.0, "Wired"),
+                                      (0.08, 0.30, 2.0, "Physical")]),
+    "s13": dict(img="#s13-img", size=scr(960, 1576, 1480), view=(960, 850), t0=11.0,
+                co=(132, 860), stops=[(0.58, 0.18, 1.8, "Network conditions"),
+                                      (0.44, 0.71, 1.8, "Device checks"),
+                                      (0.85, 0.74, 1.8, "Thirty-day activity")]),
+    "s08": dict(img="#s08-ipad img", size=scr(560, 906, 1307), view=(560, 808), t0=12.0,
+                co=(132, 880), stops=[(0.5, 0.17, 1.8, "iPhones and iPads"),
+                                      (0.5, 0.42, 1.8, "Payment devices and printers"),
+                                      (0.5, 0.82, 1.8, "My actions and notifications")]),
+    "s09": dict(img="#s09-ipad img", size=scr(560, 903, 1305), view=(560, 809), t0=7.0,
+                co=(902, 860), stops=[(0.30, 0.40, 1.8, "Apps"),
+                                      (0.28, 0.52, 1.8, "Fixes · guided steps"),
+                                      (0.30, 0.70, 1.8, "Device history")]),
+}
+# Focus beats for multi-device scenes: one device steps forward while the others recede.
+FOCUS = {
+    "s10": dict(t0=14.0, co=(132, 700), items=[("#s10-a", "Issues"), ("#s10-b", "Issue details"),
+                                              ("#s10-c", "Telemetry in the ticket")]),
+    "s11": dict(t0=8.0, co=(132, 870), items=[("#s11-i1", "Audit · open exceptions"), ("#s11-i2", "Audit report")]),
+    "s12": dict(t0=10.0, co=(132, 960), items=[("#s12-i1", "Tamper checklist"), ("#s12-i2", "Report tamper issue")]),
+}
+
+CALLOUT_CSS = """
+#ID-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#ID-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#ID-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#ID-root .ipad .scr img { border-radius: 0; }
+"""
+
+
+def callouts(sid, pos, labels):
+    x, y = pos
+    return "".join(f'<div class="co" id="{sid}-co{i}" style="left:{x}px;top:{y}px"><i></i>{t}</div>'
+                   for i, t in enumerate(labels))
+
+
+def station_js(sid, cfg, D):
+    (w, h), (vw, vh) = cfg["size"], cfg["view"]
+    stops, t0 = cfg["stops"], cfg["t0"]
+    end = D - 3.5
+    step = (end - t0) / len(stops)
+    out = [f"  TL.set('{cfg['img']}', {{ transformOrigin: '0 0' }}, 0);"]
+    for i, (px, py, sc, _) in enumerate(stops):
+        x = min(0, max(vw - sc * w, vw / 2 - sc * px * w))
+        y = min(0, max(vh - sc * h, vh / 2 - sc * py * h))
+        t = t0 + i * step
+        out.append(f"  TL.to('{cfg['img']}', {{ x: {x:.1f}, y: {y:.1f}, scale: {sc}, duration: 1.8, ease: 'power2.inOut' }}, {t:.2f});")
+        out.append(f"  TL.fromTo('#{sid}-co{i}', {{ opacity: 0, y: 12 }}, {{ opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }}, {t + 1.3:.2f});")
+        out.append(f"  TL.to('#{sid}-co{i}', {{ opacity: 0, duration: 0.4 }}, {t + step - 0.5:.2f});")
+    out.append(f"  TL.to('{cfg['img']}', {{ x: 0, y: 0, scale: 1, duration: 2.0, ease: 'power2.inOut' }}, {end:.2f});")
+    return "\n".join(out) + "\n"
+
+
+def focus_js(sid, cfg, D):
+    items, t0 = cfg["items"], cfg["t0"]
+    end = D - 3.0
+    step = (end - t0) / len(items)
+    sels = [s for s, _ in items]
+    out = []
+    for i, (sel, _) in enumerate(items):
+        t = t0 + i * step
+        others = ", ".join(o for o in sels if o != sel)
+        out.append(f"  TL.set('{sel}', {{ zIndex: 5 }}, {t:.2f});")
+        out.append(f"  TL.to('{sel}', {{ scale: 1.16, opacity: 1, duration: 1.2, ease: 'power2.inOut' }}, {t:.2f});")
+        out.append(f"  TL.to('{others}', {{ opacity: 0.3, duration: 1.0, ease: 'power1.inOut' }}, {t:.2f});")
+        out.append(f"  TL.fromTo('#{sid}-co{i}', {{ opacity: 0, y: 12 }}, {{ opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }}, {t + 0.9:.2f});")
+        out.append(f"  TL.to('#{sid}-co{i}', {{ opacity: 0, duration: 0.4 }}, {t + step - 0.6:.2f});")
+        out.append(f"  TL.to('{sel}', {{ scale: 1, duration: 1.0, ease: 'power2.inOut' }}, {t + step - 0.8:.2f});")
+        out.append(f"  TL.set('{sel}', {{ zIndex: 'auto' }}, {t + step:.2f});")
+    out.append(f"  TL.to('{', '.join(sels)}', {{ opacity: 1, duration: 1.0, ease: 'power1.inOut' }}, {end:.2f});")
+    return "\n".join(out) + "\n"
+
+
 def wrap_stage(sid, markup):
     # Proof scenes already carry their own .stage; wrap the rest so seams have one target.
     if 'class="stage"' in markup:
@@ -458,18 +574,38 @@ def wrap_stage(sid, markup):
     return f'\n  <div class="stage">{markup}  </div>\n'
 
 
-def build():
+def build(cut="long"):
+    """cut="short" rebuilds the 2:31 film; cut="long" (default) builds the 9:00 film."""
+    import re
+    long = cut == "long"
     (ROOT / "compositions").mkdir(exist_ok=True)
     t = 0.0
     slots = []
-    for sid, name, dur, tin, tout in SCENES:
+    for n, (sid, name, dur0, tin, tout) in enumerate(SCENES):
         markup, css, js = S[sid]
         markup = wrap_stage(sid, markup)
-        push_in = ("tl.fromTo('#ID-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);"
+        dur = LONG_DURS[n] if long else dur0
+        k = LONG_K.get(sid, dur / dur0) if long else 1.0
+        extra_js = ""
+        if long and sid in STATIONS:
+            cfg = STATIONS[sid]
+            # Stations own the screenshot's camera, so drop the short cut's single push on it.
+            js = "\n".join(l for l in js.split("\n") if not l.strip().startswith(f"tl.fromTo('{cfg['img']}'"))
+            markup = markup.rstrip()[:-len("</div>")] + callouts(sid, cfg["co"], [st[3] for st in cfg["stops"]]) + "\n  </div>\n"
+            extra_js = station_js(sid, cfg, dur)
+        if long and sid in FOCUS:
+            cfg = FOCUS[sid]
+            markup = markup.rstrip()[:-len("</div>")] + callouts(sid, cfg["co"], [it[1] for it in cfg["items"]]) + "\n  </div>\n"
+            extra_js = focus_js(sid, cfg, dur)
+        markup = markup.replace('<div class="stage">', '<div class="stage" data-layout-allow-overflow>')
+        # iPad screens get a clipping viewport so stations can zoom inside the device frame.
+        markup = re.sub(r'(<div class="ipad"[^>]*>)(<img [^>]*>)', r'\1<div class="scr">\2</div>', markup)
+        push_in = ("TL.fromTo('#ID-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);"
                    if tin == "push" else "")
-        seam_out = {"push": "tl.to('#ID-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);",
-                    "fade": "tl.to('#ID-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);"}.get(tout, "")
-        shared_js = SHARED_JS.replace("PUSH_IN", push_in).replace("ID", sid).replace("DUR", str(dur))
+        seam_out = {"push": "TL.to('#ID-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);",
+                    "fade": "TL.to('#ID-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);"}.get(tout, "")
+        shared_js = (SHARED_JS.replace("PUSH_IN", push_in).replace("ID", sid).replace("DUR", str(dur))
+                     .replace("KVAL", f"{k:.4f}").replace("BREATHE", "1.03" if long else "1.0"))
         exit_js = EXIT_JS.replace("SEAM_OUT", seam_out).replace("ID", sid)
         html = f"""<!doctype html>
 <html lang="en">
@@ -478,10 +614,10 @@ def build():
   </head>
   <body>
     <template>
-      <style>{SHARED_CSS.replace('ID', sid)}{css}</style>
+      <style>{SHARED_CSS.replace('ID', sid)}{CALLOUT_CSS.replace('ID', sid)}{css}</style>
       <div id="{sid}-root" data-composition-id="{sid}" data-width="1920" data-height="1080">{markup}</div>
       <script>
-(() => {{{shared_js}{js}{exit_js}}})();
+(() => {{{shared_js}{js}{extra_js}{exit_js}}})();
       </script>
     </template>
   </body>
@@ -492,6 +628,7 @@ def build():
                      f'data-start="{round(t, 2)}" data-duration="{dur}" data-track-index="1" data-width="1920" data-height="1080"></div>')
         t += dur
     total = round(t, 2)
+    music = "assets/audio/aylex-rush-9min.mp3" if long else "assets/audio/aylex-rush.mp3"
     index = f"""<!doctype html>
 <html lang="en">
   <head>
@@ -508,7 +645,7 @@ def build():
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="{total}" data-width="1920" data-height="1080">
 {chr(10).join(slots)}
-      <audio id="music" data-timeline-role="music" src="assets/audio/aylex-rush.mp3" data-start="0" data-duration="{total}" data-track-index="10" data-volume="0.8"></audio>
+      <audio id="music" data-timeline-role="music" src="{music}" data-start="0" data-duration="{total}" data-track-index="10" data-volume="0.8"></audio>
     </div>
     <script>
       window.__timelines["main"] = gsap.timeline({{ paused: true }});
@@ -521,4 +658,5 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    import sys
+    build(sys.argv[1] if len(sys.argv) > 1 else "long")

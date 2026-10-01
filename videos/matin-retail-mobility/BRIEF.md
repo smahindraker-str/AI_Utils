@@ -7,7 +7,7 @@ destination: event-screen
 aspect: 1920x1080
 language: en
 audience: retail technology and store operations leaders at an industry event or on the web
-length: 151.4s
+length: 540.4s
 angle: customer-story
 narration: no
 ---
@@ -33,9 +33,12 @@ Apple keynote design language: clean, confident, executive.
 - assets/deck/image11.png, image12.png — Site Manager Audit and Audit Report (slide 11).
 - assets/deck/image13.png, image14.png — PIN pad tamper inspection pass / report tamper (slide 12).
 - assets/deck/image15.png — Enterprise Manager Smart Support device view (slide 13).
-- assets/audio/aylex-rush.mp3 — "Rush" by Aylex (freetouse.com), user-supplied music bed, plays under the whole film.
+- assets/audio/aylex-rush.mp3 — "Rush" by Aylex (freetouse.com), user-supplied music bed for the 2:31 cut.
+- assets/audio/aylex-rush-9min.mp3 — the same track looped at phrase boundaries with 1 s crossfades (0-140.4, 14.4-140.4 twice, 0.4-151.4) to 540.4 s, for the 9:00 cut.
 
 ## Customizations
+
+- 9:00 cut requested after the 2:31 cut: "slow down the previous video and make it a 9 min video"; deck only, deeper treatment; loop Rush with crossfades.
 
 - Music bed under the whole piece; on-screen type carries the narrative.
 

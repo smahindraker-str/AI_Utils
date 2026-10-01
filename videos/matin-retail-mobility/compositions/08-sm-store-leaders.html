@@ -29,18 +29,26 @@
 #s08-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
 #s08-root .win img { display: block; width: 100%; }
 #s08-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+
+#s08-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#s08-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#s08-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#s08-root .ipad .scr img { border-radius: 0; }
 </style>
       <div id="s08-root" data-composition-id="s08" data-width="1920" data-height="1080">
   <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
-  <div class="stage">
+  <div class="stage" data-layout-allow-overflow>
   <div class="k "><svg class="ring k-ring" viewBox="0 0 36 36" style="width:30px;height:30px"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg><span class="k-t">Site Manager · Store leaders</span></div>
   <div class="h md split" id="s08-head" style="position:absolute;left:130px;top:280px;width:880px">Is the store ready to open? One glance.</div>
   
   <div class="b" id="s08-body" style="position:absolute;left:132px;top:560px;width:720px">Every device in the store, and whether it is healthy. iPhones, iPads, payment devices, printers.</div>
   <div id="s08-ready" style="position:absolute;left:132px;top:760px;display:flex;align-items:center;gap:18px;font-weight:700;font-size:40px">
     <span id="s08-dot" style="width:22px;height:22px;border-radius:50%;background:#30d158;display:block"></span>Ready for business.</div>
-  <div class="ipad" id="s08-ipad" style="right:150px;top:90px;width:600px"><img src="assets/deck/image6.png" alt=""></div>
+  <div class="ipad" id="s08-ipad" style="right:150px;top:90px;width:600px"><div class="scr"><img src="assets/deck/image6.png" alt=""></div></div>
 
+  <div class="co" id="s08-co0" style="left:132px;top:880px"><i></i>iPhones and iPads</div><div class="co" id="s08-co1" style="left:132px;top:880px"><i></i>Payment devices and printers</div><div class="co" id="s08-co2" style="left:132px;top:880px"><i></i>My actions and notifications</div>
   </div>
 </div>
       <script>
@@ -57,8 +65,21 @@
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = 10.0;
+  const TL = gsap.timeline({ paused: true });
+  const D = 35.0, K = 1.7000, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -66,19 +87,33 @@
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#s08-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#s08-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#s08-root .stage', { scale: 1 }, 0);
+  TL.to('#s08-root .stage', { scale: 1.03, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
-  tl.fromTo('#s08-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
+  TL.fromTo('#s08-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
 
   tl.fromTo('#s08-ipad', { y: 160, opacity: 0 }, { y: 0, opacity: 1, duration: 1.4, ease: 'power3.out' }, 0.3);
-  tl.to('#s08-ipad', { y: -18, duration: 8.0, ease: 'none' }, 1.7);
+  tl.to('#s08-ipad', { y: -18, duration: 8.0, ease: 'none', _k: 1 }, 1.7);
   rise('#s08-head', 0.9, 0.09, 0.9);
   fadeUp('#s08-body', 3.0);
   tl.fromTo('#s08-ready', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 5.4);
   tl.fromTo('#s08-dot', { scale: 0 }, { scale: 1, duration: 0.6, ease: 'back.out(2.2)' }, 5.5);
+  TL.set('#s08-ipad img', { transformOrigin: '0 0' }, 0);
+  TL.to('#s08-ipad img', { x: -224.0, y: 0.0, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 12.00);
+  TL.fromTo('#s08-co0', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 13.30);
+  TL.to('#s08-co0', { opacity: 0, duration: 0.4 }, 18.00);
+  TL.to('#s08-ipad img', { x: -224.0, y: -206.7, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 18.50);
+  TL.fromTo('#s08-co1', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 19.80);
+  TL.to('#s08-co1', { opacity: 0, duration: 0.4 }, 24.50);
+  TL.to('#s08-ipad img', { x: -224.0, y: -646.1, scale: 1.8, duration: 1.8, ease: 'power2.inOut' }, 25.00);
+  TL.fromTo('#s08-co2', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 26.30);
+  TL.to('#s08-co2', { opacity: 0, duration: 0.4 }, 31.00);
+  TL.to('#s08-ipad img', { x: 0, y: 0, scale: 1, duration: 2.0, ease: 'power2.inOut' }, 31.50);
 
-  tl.to('#s08-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
-  window.__timelines['s08'] = tl;
+  TL.to('#s08-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s08'] = TL;
 })();
       </script>
     </template>

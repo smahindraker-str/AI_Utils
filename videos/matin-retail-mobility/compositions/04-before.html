@@ -30,12 +30,19 @@
 #s04-root .win img { display: block; width: 100%; }
 #s04-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
 
+#s04-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#s04-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#s04-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#s04-root .ipad .scr img { border-radius: 0; }
+
 #s04-root .pain { display: flex; gap: 24px; align-items: flex-start; font-size: 34px; line-height: 1.32; color: #f5f5f7; }
 #s04-root .pain svg { flex: none; margin-top: 4px; }
 #s04-root .pill { font-weight: 700; font-size: 44px; border: 2px solid #3a3a3e; border-radius: 99px; padding: 20px 40px; color: #8e8e93; }
 </style>
       <div id="s04-root" data-composition-id="s04" data-width="1920" data-height="1080">
-  <div class="stage">
+  <div class="stage" data-layout-allow-overflow>
   <div class="k "><span class="k-t">The problem</span></div>
   <div class="h md split" id="s04-title" style="position:absolute;left:130px;top:160px;width:1600px">Before ienterprise.</div>
   <div id="s04-list" style="position:absolute;left:130px;top:300px;width:1180px;display:grid;gap:30px"><div class="pain" id="s04-p0"><svg class="ring " viewBox="0 0 36 36" style="width:34px;height:34px"><circle cx="18" cy="18" r="15" fill="none" stroke="#48484c" stroke-width="3" stroke-dasharray="40 100"/></svg><span>Educators could not see if a device was healthy.</span></div><div class="pain" id="s04-p1"><svg class="ring " viewBox="0 0 36 36" style="width:34px;height:34px"><circle cx="18" cy="18" r="15" fill="none" stroke="#48484c" stroke-width="3" stroke-dasharray="40 100"/></svg><span>Every issue went to the Educator Help Center.</span></div><div class="pain" id="s04-p2"><svg class="ring " viewBox="0 0 36 36" style="width:34px;height:34px"><circle cx="18" cy="18" r="15" fill="none" stroke="#48484c" stroke-width="3" stroke-dasharray="40 100"/></svg><span>Every fix needed access to an MDM console.</span></div><div class="pain" id="s04-p3"><svg class="ring " viewBox="0 0 36 36" style="width:34px;height:34px"><circle cx="18" cy="18" r="15" fill="none" stroke="#48484c" stroke-width="3" stroke-dasharray="40 100"/></svg><span>Troubleshooting took too long, with back-and-forth between stores and the Educator Help Center before an incident was resolved.</span></div></div>
@@ -60,8 +67,21 @@
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = 12.0;
+  const TL = gsap.timeline({ paused: true });
+  const D = 42.0, K = 3.5000, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -69,7 +89,10 @@
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#s04-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#s04-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#s04-root .stage', { scale: 1 }, 0);
+  TL.to('#s04-root .stage', { scale: 1.03, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
   
 
@@ -81,8 +104,8 @@
   tl.fromTo('#s04-arrow', { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }, 8.6);
   tl.fromTo('#s04-pill2', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)' }, 9.0);
 
-  tl.to('#s04-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);
-  window.__timelines['s04'] = tl;
+  TL.to('#s04-root .stage', { opacity: 0, duration: 0.4, ease: 'power1.in' }, D - 0.4);
+  window.__timelines['s04'] = TL;
 })();
       </script>
     </template>

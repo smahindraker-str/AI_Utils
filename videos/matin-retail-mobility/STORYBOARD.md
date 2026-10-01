@@ -21,6 +21,14 @@ mode: collaborative
 - **Seam rule:** one direction for the whole film, content exits left, next scene enters from the right. Act changes use a cut to black.
 - **Truthfulness:** every product screen is a real capture from the source deck. All copy is the deck's own wording. No invented metrics.
 
+## 9:00 cut
+
+- Same 16 scenes, same copy, same order. Built with `python3 scripts/build_scenes.py long` (default); `short` rebuilds the 2:31 cut.
+- Scene lengths: 28.4, 21, 28, 42, 34, 21, 28, 35, 27, 35, 28, 28, 34, 49, 63, 39 s (540.4 s), cuts snapped to the looped bed's phrase grid.
+- Pacing: reveals spread across the longer scenes; moves slow by up to 1.8x; a 3% stage push runs under every scene.
+- Deeper treatment, deck only: camera stations on the real screens with on-screen panel names as labels (06 Store readiness / Store health by device / Support; 07 Wi-Fi / Wired / Physical; 08 iPhones and iPads / Payment devices and printers / My actions and notifications; 09 Apps / Fixes · guided steps / Device history; 13 Network conditions / Device checks / Thirty-day activity) and focus beats on multi-device scenes (10 Issues / Issue details / Telemetry in the ticket; 11 Audit · open exceptions / Audit report; 12 Tamper checklist / Report tamper issue). No prototype numbers are called out.
+- Scene 09 stations avoid the device-owner line so the email address in the capture is never enlarged.
+
 ## Locked
 
 - Plan approved and sketch sheet (storyboard.html v1) confirmed by the user with no changes.

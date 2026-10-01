@@ -30,6 +30,13 @@
 #s14-root .win img { display: block; width: 100%; }
 #s14-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
 
+#s14-root .co { position: absolute; display: flex; align-items: center; gap: 14px; opacity: 0;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f5f7;
+  border: 1px solid #3a3a3e; border-radius: 99px; padding: 14px 22px; background: #0b0b0d; }
+#s14-root .co i { width: 12px; height: 12px; border-radius: 50%; background: #30d158; display: block; }
+#s14-root .ipad .scr { overflow: hidden; border-radius: 27px; }
+#s14-root .ipad .scr img { border-radius: 0; }
+
 #s14-root .row { position: relative; display: grid; grid-template-columns: 100px 1fr; padding: 30px 0; }
 #s14-root .rule { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: #2c2c30; }
 #s14-root .rn { font: 400 22px/1.6 'JetBrains Mono', monospace; color: #8e8e93; }
@@ -38,7 +45,7 @@
 </style>
       <div id="s14-root" data-composition-id="s14" data-width="1920" data-height="1080">
   <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
-  <div class="stage">
+  <div class="stage" data-layout-allow-overflow>
   <div class="k lc"><span class="k-t">ienterprise</span></div>
   <div class="h md split" id="s14-title" style="position:absolute;left:130px;top:160px;width:1600px">Business transformation at Lululemon.</div>
   <div id="s14-rows" style="position:absolute;left:130px;top:310px;width:1100px">
@@ -68,8 +75,21 @@
   $$('.type').forEach((el) => {
     el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
   });
-  const tl = gsap.timeline({ paused: true });
-  const D = 13.9;
+  const TL = gsap.timeline({ paused: true });
+  const D = 49.0, K = 3.5252, DK = Math.min(1.8, Math.sqrt(K));
+  // Scene code below is authored on the 2:31 cut's clock. In the long cut, positions stretch by K
+  // and moves by DK (or by K when a tween is marked _k, for slow continuous camera moves).
+  const sv = (v) => {
+    const o = Object.assign({}, v);
+    if (o.duration != null) o.duration *= o._k ? K : DK;
+    if (typeof o.stagger === 'number') o.stagger *= DK;
+    delete o._k;
+    return o;
+  };
+  const tl = {
+    fromTo: (t, a, b, p) => TL.fromTo(t, a, sv(b), p * K),
+    to: (t, b, p) => TL.to(t, sv(b), p * K),
+  };
   const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
     tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
   const fadeUp = (sel, at, y = 28, dur = 0.6) =>
@@ -77,7 +97,10 @@
   const typeIn = (sel, at, per = 0.035) =>
     tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
   // Ambient: the ghost status ring turns slowly for the whole scene.
-  if ($('.ghost')) tl.fromTo('#s14-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  if ($('.ghost')) TL.fromTo('#s14-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Ambient: a slow push on the whole stage so long holds never sit dead.
+  TL.set('#s14-root .stage', { scale: 1 }, 0);
+  TL.to('#s14-root .stage', { scale: 1.03, duration: D, ease: 'none' }, 0);
   // Seams: push enters from the right; exits leave to the left or fade through black.
   
 
@@ -92,8 +115,8 @@
   fadeUp('#s14-card', 9.4, 60, 0.9);
   tl.fromTo('#s14-guest', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 10.3);
 
-  tl.to('#s14-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
-  window.__timelines['s14'] = tl;
+  TL.to('#s14-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s14'] = TL;
 })();
       </script>
     </template>
