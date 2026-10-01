@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+#s07-root { position: absolute; inset: 0; overflow: hidden; background: #0b0b0d; color: #f5f5f7;
+  font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+#s07-root .stage { position: absolute; inset: 0; }
+#s07-root .ghost { position: absolute; width: 1300px; height: 1300px; right: -420px; top: -110px; opacity: 0.05; }
+#s07-root .k { position: absolute; left: 130px; top: 112px; display: flex; align-items: center; gap: 16px;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8e93; }
+#s07-root .k.lc { text-transform: none; letter-spacing: 0.04em; }
+#s07-root .h { font-weight: 900; letter-spacing: -0.045em; line-height: 1.02; }
+#s07-root .xl { font-size: 134px; }
+#s07-root .lg { font-size: 88px; }
+#s07-root .md { font-size: 69px; }
+#s07-root .b { font-size: 30px; line-height: 1.4; color: #8e8e93; font-weight: 400; }
+#s07-root .b strong { color: #f5f5f7; font-weight: 700; }
+#s07-root .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+#s07-root .wi { display: inline-block; }
+#s07-root .chip { display: inline-block; font: 400 20px/1 'JetBrains Mono', monospace; letter-spacing: 0.08em;
+  text-transform: uppercase; border: 1px solid #3a3a3e; color: #f5f5f7; border-radius: 99px; padding: 12px 20px; }
+#s07-root .ipad { position: absolute; background: #000; border-radius: 44px; padding: 17px; border: 3px solid #3a3a3e;
+  box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s07-root .ipad img { display: block; width: 100%; border-radius: 27px; }
+#s07-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s07-root .win img { display: block; width: 100%; }
+#s07-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+</style>
+      <div id="s07-root" data-composition-id="s07" data-width="1920" data-height="1080">
+  <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
+  <div class="stage">
+  <div class="k "><svg class="ring k-ring" viewBox="0 0 36 36" style="width:30px;height:30px"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg><span class="k-t">Enterprise Manager · Networking</span></div>
+  <div class="h md split" id="s07-head" style="position:absolute;left:130px;top:250px;width:640px">All devices in the store and the network, correlated.</div>
+  
+  <div class="b" id="s07-sub" style="position:absolute;left:132px;top:640px;width:560px">The fleet, understood before the phone rings.</div>
+  <div class="win" id="s07-win" style="left:830px;top:220px;width:1190px">
+    <img id="s07-img" src="assets/deck/image5.png" alt=""></div>
+
+  </div>
+</div>
+      <script>
+(() => {
+  const R = document.getElementById('s07-root');
+  const $ = (s) => R.querySelector(s);
+  const $$ = (s) => Array.from(R.querySelectorAll(s));
+  // Wrap each word of .split elements in a mask so it can rise into view.
+  $$('.split').forEach((el) => {
+    el.innerHTML = el.textContent.trim().split(/\s+/)
+      .map((w) => '<span class="w" data-layout-allow-overflow><span class="wi">' + w + '</span></span>').join(' ');
+  });
+  // Per-character spans for typed kickers.
+  $$('.type').forEach((el) => {
+    el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
+  });
+  const tl = gsap.timeline({ paused: true });
+  const D = 7.0;
+  const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
+  const fadeUp = (sel, at, y = 28, dur = 0.6) =>
+    tl.fromTo(sel, { opacity: 0, y }, { opacity: 1, y: 0, duration: dur, ease: 'power3.out' }, at);
+  const typeIn = (sel, at, per = 0.035) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
+  // Ambient: the ghost status ring turns slowly for the whole scene.
+  if ($('.ghost')) tl.fromTo('#s07-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Seams: push enters from the right; exits leave to the left or fade through black.
+  tl.fromTo('#s07-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
+
+  rise('#s07-head', 0.3, 0.06);
+  tl.fromTo('#s07-win', { x: 320, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.5);
+  tl.fromTo('#s07-img', { scale: 1.18, x: 40 }, { scale: 1.3, x: -120, transformOrigin: '30% 45%', duration: 6.0, ease: 'power1.inOut' }, 0.8);
+  fadeUp('#s07-sub', 3.0);
+
+  tl.to('#s07-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s07'] = tl;
+})();
+      </script>
+    </template>
+  </body>
+</html>

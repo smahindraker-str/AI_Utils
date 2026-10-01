@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+#s08-root { position: absolute; inset: 0; overflow: hidden; background: #0b0b0d; color: #f5f5f7;
+  font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+#s08-root .stage { position: absolute; inset: 0; }
+#s08-root .ghost { position: absolute; width: 1300px; height: 1300px; right: -420px; top: -110px; opacity: 0.05; }
+#s08-root .k { position: absolute; left: 130px; top: 112px; display: flex; align-items: center; gap: 16px;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8e93; }
+#s08-root .k.lc { text-transform: none; letter-spacing: 0.04em; }
+#s08-root .h { font-weight: 900; letter-spacing: -0.045em; line-height: 1.02; }
+#s08-root .xl { font-size: 134px; }
+#s08-root .lg { font-size: 88px; }
+#s08-root .md { font-size: 69px; }
+#s08-root .b { font-size: 30px; line-height: 1.4; color: #8e8e93; font-weight: 400; }
+#s08-root .b strong { color: #f5f5f7; font-weight: 700; }
+#s08-root .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+#s08-root .wi { display: inline-block; }
+#s08-root .chip { display: inline-block; font: 400 20px/1 'JetBrains Mono', monospace; letter-spacing: 0.08em;
+  text-transform: uppercase; border: 1px solid #3a3a3e; color: #f5f5f7; border-radius: 99px; padding: 12px 20px; }
+#s08-root .ipad { position: absolute; background: #000; border-radius: 44px; padding: 17px; border: 3px solid #3a3a3e;
+  box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s08-root .ipad img { display: block; width: 100%; border-radius: 27px; }
+#s08-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s08-root .win img { display: block; width: 100%; }
+#s08-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+</style>
+      <div id="s08-root" data-composition-id="s08" data-width="1920" data-height="1080">
+  <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
+  <div class="stage">
+  <div class="k "><svg class="ring k-ring" viewBox="0 0 36 36" style="width:30px;height:30px"><circle cx="18" cy="18" r="15" fill="none" stroke="#30d158" stroke-width="3"/></svg><span class="k-t">Site Manager · Store leaders</span></div>
+  <div class="h md split" id="s08-head" style="position:absolute;left:130px;top:280px;width:880px">Is the store ready to open? One glance.</div>
+  
+  <div class="b" id="s08-body" style="position:absolute;left:132px;top:560px;width:720px">Every device in the store, and whether it is healthy. iPhones, iPads, payment devices, printers.</div>
+  <div id="s08-ready" style="position:absolute;left:132px;top:760px;display:flex;align-items:center;gap:18px;font-weight:700;font-size:40px">
+    <span id="s08-dot" style="width:22px;height:22px;border-radius:50%;background:#30d158;display:block"></span>Ready for business.</div>
+  <div class="ipad" id="s08-ipad" style="right:150px;top:90px;width:600px"><img src="assets/deck/image6.png" alt=""></div>
+
+  </div>
+</div>
+      <script>
+(() => {
+  const R = document.getElementById('s08-root');
+  const $ = (s) => R.querySelector(s);
+  const $$ = (s) => Array.from(R.querySelectorAll(s));
+  // Wrap each word of .split elements in a mask so it can rise into view.
+  $$('.split').forEach((el) => {
+    el.innerHTML = el.textContent.trim().split(/\s+/)
+      .map((w) => '<span class="w" data-layout-allow-overflow><span class="wi">' + w + '</span></span>').join(' ');
+  });
+  // Per-character spans for typed kickers.
+  $$('.type').forEach((el) => {
+    el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
+  });
+  const tl = gsap.timeline({ paused: true });
+  const D = 10.0;
+  const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
+  const fadeUp = (sel, at, y = 28, dur = 0.6) =>
+    tl.fromTo(sel, { opacity: 0, y }, { opacity: 1, y: 0, duration: dur, ease: 'power3.out' }, at);
+  const typeIn = (sel, at, per = 0.035) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
+  // Ambient: the ghost status ring turns slowly for the whole scene.
+  if ($('.ghost')) tl.fromTo('#s08-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Seams: push enters from the right; exits leave to the left or fade through black.
+  tl.fromTo('#s08-root .stage', { x: 160, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0);
+
+  tl.fromTo('#s08-ipad', { y: 160, opacity: 0 }, { y: 0, opacity: 1, duration: 1.4, ease: 'power3.out' }, 0.3);
+  tl.to('#s08-ipad', { y: -18, duration: 8.0, ease: 'none' }, 1.7);
+  rise('#s08-head', 0.9, 0.09, 0.9);
+  fadeUp('#s08-body', 3.0);
+  tl.fromTo('#s08-ready', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }, 5.4);
+  tl.fromTo('#s08-dot', { scale: 0 }, { scale: 1, duration: 0.6, ease: 'back.out(2.2)' }, 5.5);
+
+  tl.to('#s08-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s08'] = tl;
+})();
+      </script>
+    </template>
+  </body>
+</html>

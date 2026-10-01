@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+#s14-root { position: absolute; inset: 0; overflow: hidden; background: #0b0b0d; color: #f5f5f7;
+  font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+#s14-root .stage { position: absolute; inset: 0; }
+#s14-root .ghost { position: absolute; width: 1300px; height: 1300px; right: -420px; top: -110px; opacity: 0.05; }
+#s14-root .k { position: absolute; left: 130px; top: 112px; display: flex; align-items: center; gap: 16px;
+  font: 400 22px/1 'JetBrains Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8e93; }
+#s14-root .k.lc { text-transform: none; letter-spacing: 0.04em; }
+#s14-root .h { font-weight: 900; letter-spacing: -0.045em; line-height: 1.02; }
+#s14-root .xl { font-size: 134px; }
+#s14-root .lg { font-size: 88px; }
+#s14-root .md { font-size: 69px; }
+#s14-root .b { font-size: 30px; line-height: 1.4; color: #8e8e93; font-weight: 400; }
+#s14-root .b strong { color: #f5f5f7; font-weight: 700; }
+#s14-root .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+#s14-root .wi { display: inline-block; }
+#s14-root .chip { display: inline-block; font: 400 20px/1 'JetBrains Mono', monospace; letter-spacing: 0.08em;
+  text-transform: uppercase; border: 1px solid #3a3a3e; color: #f5f5f7; border-radius: 99px; padding: 12px 20px; }
+#s14-root .ipad { position: absolute; background: #000; border-radius: 44px; padding: 17px; border: 3px solid #3a3a3e;
+  box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s14-root .ipad img { display: block; width: 100%; border-radius: 27px; }
+#s14-root .win { position: absolute; background: #fff; border-radius: 27px; overflow: hidden; box-shadow: 0 40px 96px rgba(0,0,0,0.6); }
+#s14-root .win img { display: block; width: 100%; }
+#s14-root .card { position: absolute; background: #1c1c1e; border-radius: 31px; }
+
+#s14-root .row { position: relative; display: grid; grid-template-columns: 100px 1fr; padding: 30px 0; }
+#s14-root .rule { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: #2c2c30; }
+#s14-root .rn { font: 400 22px/1.6 'JetBrains Mono', monospace; color: #8e8e93; }
+#s14-root .rt { font-weight: 800; font-size: 44px; letter-spacing: -0.025em; }
+#s14-root .rs { font-size: 26px; line-height: 1.4; color: #8e8e93; margin-top: 10px; max-width: 900px; }
+</style>
+      <div id="s14-root" data-composition-id="s14" data-width="1920" data-height="1080">
+  <svg class="ghost" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#f5f5f7" stroke-width="0.5" stroke-dasharray="210 80"/></svg>
+  <div class="stage">
+  <div class="k lc"><span class="k-t">ienterprise</span></div>
+  <div class="h md split" id="s14-title" style="position:absolute;left:130px;top:160px;width:1600px">Business transformation at Lululemon.</div>
+  <div id="s14-rows" style="position:absolute;left:130px;top:310px;width:1100px">
+    <div class="row" id="s14-r0"><div class="rule"></div>
+      <div class="rn">01</div><div><div class="rt">Stores open ready, every morning.</div><div class="rs">Every store leader sees every device and knows the store is ready for business.</div></div></div>
+    <div class="row" id="s14-r1"><div class="rule"></div>
+      <div class="rn">02</div><div><div class="rt">Issues resolve faster.</div><div class="rs">Incidents arrive with telemetry attached, so the help desk resolves them faster. Educators fix common issues on the spot.</div></div></div>
+    <div class="row" id="s14-r2"><div class="rule"></div>
+      <div class="rn">03</div><div><div class="rt">Compliance became routine.</div><div class="rs">PIM and PAM requirements met. Device audits and PCI tamper inspections done by the store, every day.</div></div></div></div>
+  <div class="card" id="s14-card" style="right:130px;bottom:110px;width:560px;padding:44px">
+    <div style="font-size:30px;line-height:1.35;color:#8e8e93">Retail mobile operations are now more efficient and effective.</div>
+    <div id="s14-guest" style="font-weight:800;font-size:44px;line-height:1.1;letter-spacing:-.02em;margin-top:20px">Educators stayed with guests.</div>
+  </div>
+  </div>
+</div>
+      <script>
+(() => {
+  const R = document.getElementById('s14-root');
+  const $ = (s) => R.querySelector(s);
+  const $$ = (s) => Array.from(R.querySelectorAll(s));
+  // Wrap each word of .split elements in a mask so it can rise into view.
+  $$('.split').forEach((el) => {
+    el.innerHTML = el.textContent.trim().split(/\s+/)
+      .map((w) => '<span class="w" data-layout-allow-overflow><span class="wi">' + w + '</span></span>').join(' ');
+  });
+  // Per-character spans for typed kickers.
+  $$('.type').forEach((el) => {
+    el.innerHTML = Array.from(el.textContent).map((c) => '<span class="c">' + (c === ' ' ? '&nbsp;' : c) + '</span>').join('');
+  });
+  const tl = gsap.timeline({ paused: true });
+  const D = 13.9;
+  const rise = (sel, at, stagger = 0.06, dur = 0.7) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .wi'), { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, at);
+  const fadeUp = (sel, at, y = 28, dur = 0.6) =>
+    tl.fromTo(sel, { opacity: 0, y }, { opacity: 1, y: 0, duration: dur, ease: 'power3.out' }, at);
+  const typeIn = (sel, at, per = 0.035) =>
+    tl.fromTo(R.querySelectorAll(sel + ' .c'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: per }, at);
+  // Ambient: the ghost status ring turns slowly for the whole scene.
+  if ($('.ghost')) tl.fromTo('#s14-root .ghost', { rotation: -8 }, { rotation: 14, duration: D, ease: 'none' }, 0);
+  // Seams: push enters from the right; exits leave to the left or fade through black.
+  
+
+  fadeUp('#s14-root .k', 0.1, 12);
+  rise('#s14-title', 0.3, 0.06);
+  [1.4, 3.9, 6.4].forEach((t, i) => {
+    tl.fromTo('#s14-r' + i + ' .rule', { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: 0.8, ease: 'power2.inOut' }, t);
+    tl.fromTo('#s14-r' + i + ' .rn, #s14-r' + i + ' .rt', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, t + 0.25);
+    tl.fromTo('#s14-r' + i + ' .rs', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, t + 0.7);
+  });
+  tl.to('#s14-rows', { opacity: 0.35, duration: 0.8, ease: 'power1.inOut' }, 9.1);
+  fadeUp('#s14-card', 9.4, 60, 0.9);
+  tl.fromTo('#s14-guest', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 10.3);
+
+  tl.to('#s14-root .stage', { x: -160, opacity: 0, duration: 0.45, ease: 'power2.in' }, D - 0.45);
+  window.__timelines['s14'] = tl;
+})();
+      </script>
+    </template>
+  </body>
+</html>

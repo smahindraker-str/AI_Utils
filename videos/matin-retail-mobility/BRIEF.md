@@ -7,7 +7,7 @@ destination: event-screen
 aspect: 1920x1080
 language: en
 audience: retail technology and store operations leaders at an industry event or on the web
-length: 150s
+length: 151.4s
 angle: customer-story
 narration: no
 ---
@@ -33,6 +33,7 @@ Apple keynote design language: clean, confident, executive.
 - assets/deck/image11.png, image12.png — Site Manager Audit and Audit Report (slide 11).
 - assets/deck/image13.png, image14.png — PIN pad tamper inspection pass / report tamper (slide 12).
 - assets/deck/image15.png — Enterprise Manager Smart Support device view (slide 13).
+- assets/audio/aylex-rush.mp3 — "Rush" by Aylex (freetouse.com), user-supplied music bed, plays under the whole film.
 
 ## Customizations
 
